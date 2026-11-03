@@ -23,7 +23,7 @@ const columns = [
 export function SiteFooter() {
   return (
     <footer className="bg-dark-green text-white">
-      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+      <div className="mx-auto w-full max-w-[1400px] px-5 py-12 sm:px-8">
         {/* Divisória com o logo centralizado */}
         <div className="flex items-center gap-4">
           <span className="h-px flex-1 bg-white/25" />

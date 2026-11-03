@@ -16,7 +16,7 @@ export function ComingSoon({
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto flex min-h-[60vh] max-w-3xl flex-col items-center justify-center px-4 py-24 text-center sm:px-6">
+      <main className="mx-auto flex min-h-[60vh] max-w-3xl flex-col items-center justify-center px-5 py-24 text-center sm:px-8">
         <span className="rounded-full bg-vanilla px-3 py-1 font-display text-xs font-semibold uppercase tracking-wider text-dark-green">
           Em construção
         </span>
@@ -28,7 +28,7 @@ export function ComingSoon({
         </p>
         <Link
           href="/"
-          className="mt-8 inline-flex items-center rounded-full bg-dark-green px-6 py-3 font-display text-sm font-semibold text-white transition hover:bg-moss"
+          className="mt-8 inline-flex items-center rounded-full bg-dark-green px-6 py-3 font-display text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-moss hover:shadow-lg active:translate-y-0 active:scale-95"
         >
           Voltar para a Home
         </Link>

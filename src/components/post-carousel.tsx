@@ -1,12 +1,34 @@
 "use client";
 
-import { useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PostCard } from "@/components/post-card";
+import { cn } from "@/lib/utils";
 import type { Post } from "@/lib/mock-data";
 
 export function PostCarousel({ posts }: { posts: Post[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
+  const [atStart, setAtStart] = useState(true);
+  const [atEnd, setAtEnd] = useState(false);
+
+  const updateEdges = useCallback(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    setAtStart(el.scrollLeft <= 4);
+    setAtEnd(el.scrollLeft + el.clientWidth >= el.scrollWidth - 4);
+  }, []);
+
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    updateEdges();
+    el.addEventListener("scroll", updateEdges, { passive: true });
+    window.addEventListener("resize", updateEdges);
+    return () => {
+      el.removeEventListener("scroll", updateEdges);
+      window.removeEventListener("resize", updateEdges);
+    };
+  }, [updateEdges]);
 
   const scrollByCards = (direction: 1 | -1) => {
     const el = trackRef.current;
@@ -18,19 +40,10 @@ export function PostCarousel({ posts }: { posts: Post[] }) {
 
   return (
     <div className="relative">
-      {/* Controles */}
-      <div className="mb-4 flex items-center justify-end gap-2">
-        <CarouselButton label="Anterior" onClick={() => scrollByCards(-1)}>
-          <ChevronLeft className="h-5 w-5" />
-        </CarouselButton>
-        <CarouselButton label="Próximo" onClick={() => scrollByCards(1)}>
-          <ChevronRight className="h-5 w-5" />
-        </CarouselButton>
-      </div>
-
+      {/* Trilha */}
       <div
         ref={trackRef}
-        className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-4 pb-2 sm:mx-0 sm:px-0"
+        className="no-scrollbar -mx-5 flex snap-x snap-mandatory scroll-pl-5 gap-4 overflow-x-auto scroll-smooth px-5 pb-2 sm:-mx-8 sm:scroll-pl-8 sm:px-8"
         role="region"
         aria-label="Últimas postagens"
       >
@@ -38,33 +51,39 @@ export function PostCarousel({ posts }: { posts: Post[] }) {
           <div
             key={post.id}
             data-card
-            className="w-[78%] shrink-0 snap-start sm:w-[320px]"
+            className="w-[78%] shrink-0 snap-start sm:w-[330px]"
           >
             <PostCard post={post} />
           </div>
         ))}
       </div>
-    </div>
-  );
-}
 
-function CarouselButton({
-  label,
-  onClick,
-  children,
-}: {
-  label: string;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={label}
-      className="grid h-10 w-10 place-items-center rounded-full border border-dark-green/20 bg-white text-dark-green transition hover:bg-dark-green hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dark-green"
-    >
-      {children}
-    </button>
+      {/* Setas sobrepostas, junto aos cards (como no Figma) */}
+      <button
+        type="button"
+        onClick={() => scrollByCards(-1)}
+        aria-label="Anterior"
+        disabled={atStart}
+        className={cn(
+          "absolute left-1 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-dark-green shadow-lg ring-1 ring-black/5 backdrop-blur transition-all duration-300 ease-out hover:scale-105 hover:bg-white active:scale-95 sm:left-2",
+          atStart && "pointer-events-none -translate-x-3 opacity-0",
+        )}
+      >
+        <ChevronLeft className="h-6 w-6" />
+      </button>
+
+      <button
+        type="button"
+        onClick={() => scrollByCards(1)}
+        aria-label="Próximo"
+        disabled={atEnd}
+        className={cn(
+          "absolute right-1 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-dark-green shadow-lg ring-1 ring-black/5 backdrop-blur transition-all duration-300 ease-out hover:scale-105 hover:bg-white active:scale-95 sm:right-2",
+          atEnd && "pointer-events-none translate-x-3 opacity-0",
+        )}
+      >
+        <ChevronRight className="h-6 w-6" />
+      </button>
+    </div>
   );
 }

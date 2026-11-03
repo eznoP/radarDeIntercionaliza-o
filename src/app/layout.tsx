@@ -30,7 +30,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR" className={`${googleSans.variable} ${xmind.variable}`}>
-      <body className="min-h-dvh antialiased">{children}</body>
+      <body className="min-h-dvh antialiased">
+        {/* Compensa a navbar fixa */}
+        <div className="pt-16 sm:pt-20">{children}</div>
+      </body>
     </html>
   );
 }

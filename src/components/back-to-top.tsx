@@ -15,18 +15,27 @@ export function BackToTop() {
   }, []);
 
   return (
-    <button
-      type="button"
-      aria-label="Voltar ao topo"
-      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+    <div
       className={cn(
-        "fixed bottom-6 right-6 z-50 grid h-12 w-12 place-items-center rounded-full bg-dark-green text-white shadow-lg ring-1 ring-white/10 transition-all duration-300 hover:bg-moss focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dark-green",
+        "fixed bottom-6 left-1/2 z-50 -translate-x-1/2 transition-all duration-300 ease-out",
         visible
           ? "translate-y-0 opacity-100"
-          : "pointer-events-none translate-y-4 opacity-0",
+          : "pointer-events-none translate-y-6 opacity-0",
       )}
     >
-      <ArrowUp className="h-5 w-5" />
-    </button>
+      <button
+        type="button"
+        aria-label="Voltar ao topo"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        className="group flex items-center overflow-hidden rounded-full bg-dark-green text-white shadow-xl shadow-black/20 ring-1 ring-white/10 transition-all duration-300 ease-out hover:bg-moss active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dark-green"
+      >
+        <span className="grid h-12 w-12 shrink-0 place-items-center">
+          <ArrowUp className="h-5 w-5 transition-transform duration-300 group-hover:-translate-y-0.5" />
+        </span>
+        <span className="max-w-0 overflow-hidden whitespace-nowrap font-display text-sm font-semibold transition-[max-width,padding] duration-300 ease-out group-hover:max-w-[9rem] group-hover:pr-5">
+          Voltar ao topo
+        </span>
+      </button>
+    </div>
   );
 }
