@@ -1,0 +1,1 @@
+# radarDeIntercionaliza-o
