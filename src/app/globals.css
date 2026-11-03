@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   Design tokens — Identidade visual "Radar de Internacionalização"
+   Paleta definida pelo cliente (paleta-de-cores.webp)
+   ========================================================================== */
+@theme {
+  --color-dark-green: #243c2c;
+  --color-moss: #7a9445;
+  --color-vanilla: #ece69d;
+  --color-powder: #a9b6c4;
+  --color-glaucous: #59789f;
+
+  /* Neutros derivados para leitura */
+  --color-cream: #f6f5ec;
+  --color-sand: #e9e7db;
+  --color-ink: #1b2620;
+
+  /* Tipografia: Google Sans (display/UI) e Xmind (corpo de texto) */
+  --font-display: var(--font-google-sans), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+  --font-body: var(--font-xmind), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+
+  --radius-card: 1.25rem;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background-color: var(--color-vanilla);
+    color: var(--color-dark-green);
+  }
+}
+
+/* Esconde a barra de rolagem em carrosséis horizontais mantendo o scroll */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
