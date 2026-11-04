@@ -2,15 +2,17 @@ import "server-only";
 
 import { mockPosts } from "@/lib/mock-data";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
-import type { PostCardData } from "@/lib/post";
+import { slugify } from "@/lib/slugify";
+import type { PostCardData, PostDetail } from "@/lib/post";
 
 /** Reexporta o tipo para quem consome as publicações pelo servidor. */
-export type { PostCardData };
+export type { PostCardData, PostDetail };
 
 /** Conteúdo de exemplo, usado enquanto o Supabase não está configurado. */
 function fromMock(): PostCardData[] {
   return mockPosts.map((p) => ({
     id: p.id,
+    slug: slugify(p.title),
     title: p.title,
     category: p.category,
     image: p.image,
@@ -31,7 +33,7 @@ export async function getPublishedPosts(limit = 12): Promise<PostCardData[]> {
     const { data: rows, error } = await supabase
       .from("posts")
       .select(
-        "id, title, cover_image_url, is_featured, published_at, category_id",
+        "id, slug, title, cover_image_url, is_featured, published_at, category_id",
       )
       .eq("status", "published")
       .order("is_featured", { ascending: false })
@@ -47,6 +49,7 @@ export async function getPublishedPosts(limit = 12): Promise<PostCardData[]> {
 
     return (rows ?? []).map((row) => ({
       id: row.id,
+      slug: row.slug,
       title: row.title,
       category: nameOf.get(row.category_id) ?? "Geral",
       image: row.cover_image_url,
@@ -55,5 +58,98 @@ export async function getPublishedPosts(limit = 12): Promise<PostCardData[]> {
     }));
   } catch {
     return fromMock();
+  }
+}
+
+/** Publicação de exemplo (fallback sem Supabase) pelo slug. */
+function mockDetailBySlug(slug: string): PostDetail | null {
+  const p = mockPosts.find((m) => slugify(m.title) === slug);
+  if (!p) return null;
+  return {
+    id: p.id,
+    slug,
+    title: p.title,
+    excerpt:
+      "Conteúdo de exemplo exibido enquanto o Supabase não está configurado.",
+    content: {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            {
+              type: "text",
+              text: "Este é um conteúdo de exemplo. Assim que o Supabase estiver configurado, o texto escrito no painel aparecerá aqui.",
+            },
+          ],
+        },
+      ],
+    },
+    coverImage: p.image,
+    videoUrl: null,
+    category: p.category,
+    authorName: "Equipe Radar",
+    authorRole: null,
+    publishedAt: new Date(Date.now() - p.minutesAgo * 60000).toISOString(),
+    isFeatured: Boolean(p.isFeatured),
+  };
+}
+
+/**
+ * Publicação completa pelo slug, para a página de leitura.
+ * Retorna null se não existir (ou não estiver visível para o visitante).
+ */
+export async function getPostBySlug(slug: string): Promise<PostDetail | null> {
+  if (!isSupabaseConfigured()) return mockDetailBySlug(slug);
+
+  try {
+    const supabase = await createClient();
+    const { data: row, error } = await supabase
+      .from("posts")
+      .select("*")
+      .eq("slug", slug)
+      .maybeSingle();
+
+    if (error || !row) return null;
+
+    const [{ data: category }, { data: author }] = await Promise.all([
+      supabase
+        .from("categories")
+        .select("name")
+        .eq("id", row.category_id)
+        .maybeSingle(),
+      supabase
+        .from("profiles")
+        .select("full_name, role_id")
+        .eq("id", row.author_id)
+        .maybeSingle(),
+    ]);
+
+    let roleName: string | null = null;
+    if (author?.role_id) {
+      const { data: role } = await supabase
+        .from("roles")
+        .select("name")
+        .eq("id", author.role_id)
+        .maybeSingle();
+      roleName = role?.name ?? null;
+    }
+
+    return {
+      id: row.id,
+      slug: row.slug,
+      title: row.title,
+      excerpt: row.excerpt,
+      content: row.content,
+      coverImage: row.cover_image_url,
+      videoUrl: row.video_url,
+      category: category?.name ?? "Geral",
+      authorName: author?.full_name ?? "Equipe Radar",
+      authorRole: roleName,
+      publishedAt: row.published_at,
+      isFeatured: row.is_featured,
+    };
+  } catch {
+    return mockDetailBySlug(slug);
   }
 }

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { timeAgo, type PostCardData } from "@/lib/post";
 import { cn } from "@/lib/utils";
 
@@ -12,7 +13,9 @@ export function PostCard({
   const posted = timeAgo(post.publishedAt);
 
   return (
-    <article
+    <Link
+      href={`/noticia/${post.slug}`}
+      aria-label={post.title}
       className={cn(
         "group flex h-full w-full flex-col overflow-hidden rounded-card bg-dark-green shadow-sm ring-1 ring-black/5 transition duration-300 hover:-translate-y-1 hover:shadow-lg",
         className,
@@ -53,6 +56,6 @@ export function PostCard({
           </p>
         )}
       </div>
-    </article>
+    </Link>
   );
 }
