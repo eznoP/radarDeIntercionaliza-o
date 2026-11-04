@@ -268,14 +268,9 @@ export function PostForm({
               onChange={(e) => setFeatured(e.target.checked)}
               className="mt-0.5 h-4 w-4 accent-moss"
             />
-            <span className="font-body text-sm text-ink/80">
-              <span className="flex items-center gap-1.5 font-display font-medium text-dark-green">
-                <Star className="h-4 w-4 text-vanilla" />
-                Destaque na Home
-              </span>
-              <br />
-              A publicação marcada como destaque aparece em evidência na página
-              inicial.
+            <span className="flex items-center gap-1.5 font-display text-sm font-medium text-dark-green">
+              <Star className="h-4 w-4 text-vanilla" />
+              Destaque na Home
             </span>
           </label>
         )}
@@ -300,7 +295,7 @@ export function PostForm({
             folder="publicacoes"
             defaultValue={post?.cover_image_url}
             label="Foto de capa"
-            hint="Opcional. Convertida automaticamente para .webp."
+            hint="Opcional."
           />
           <MediaUploader
             name="video_url"
@@ -309,7 +304,7 @@ export function PostForm({
             folder="publicacoes"
             defaultValue={post?.video_url}
             label="Vídeo"
-            hint="Opcional. Convertido automaticamente para .webm."
+            hint="Opcional."
           />
         </div>
       </section>

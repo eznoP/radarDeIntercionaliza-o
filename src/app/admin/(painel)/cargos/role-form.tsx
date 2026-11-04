@@ -38,7 +38,7 @@ export function RoleForm({
       <Field
         label="Descrição"
         htmlFor="description"
-        hint="Opcional. Explica o que este cargo faz."
+        hint="Opcional."
       >
         <textarea
           id="description"
@@ -53,7 +53,7 @@ export function RoleForm({
       <Field
         label="Ordem"
         htmlFor="sort_order"
-        hint="Número menor aparece primeiro. Opcional."
+        hint="Opcional."
       >
         <input
           id="sort_order"

@@ -53,12 +53,8 @@ export default async function IntegrantesPage() {
         <div className="mx-auto w-full max-w-5xl px-5 py-12 sm:px-8 sm:py-16">
           {integrantes.length === 0 ? (
             <div className="rounded-card border border-dark-green/10 bg-white px-6 py-14 text-center shadow-sm">
-              <h2 className="font-display text-xl font-semibold text-dark-green">
-                Em breve
-              </h2>
-              <p className="mx-auto mt-2 max-w-md font-body text-sm text-ink/60">
-                Os perfis da equipe estão sendo preparados. Volte em breve para
-                conhecer quem constrói o Radar.
+              <p className="mx-auto max-w-md font-body text-sm text-ink/60">
+                Nenhum integrante publicado ainda.
               </p>
             </div>
           ) : (
@@ -122,20 +118,15 @@ export default async function IntegrantesPage() {
 
           {/* Chamada para quem é do grupo */}
           <div className="mt-12 flex flex-col items-center gap-3 rounded-card bg-dark-green px-6 py-8 text-center text-white sm:flex-row sm:justify-between sm:text-left">
-            <div>
-              <h2 className="font-display text-lg font-semibold">
-                Você é integrante do Radar?
-              </h2>
-              <p className="mt-1 font-body text-sm text-white/70">
-                Entre com o seu acesso para personalizar o seu perfil.
-              </p>
-            </div>
+            <h2 className="font-display text-lg font-semibold">
+              Você é integrante do Radar?
+            </h2>
             <Link
               href="/admin/login"
               className="inline-flex shrink-0 items-center gap-2 rounded-full bg-vanilla px-6 py-3 font-display text-sm font-semibold text-dark-green shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:scale-95"
             >
               <LogIn className="h-4 w-4" />
-              Sou integrante: entrar
+              Entrar
             </Link>
           </div>
         </div>

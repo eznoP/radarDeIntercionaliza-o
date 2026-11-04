@@ -42,9 +42,6 @@ export default async function MeuPerfilPage() {
               <h1 className="font-display text-2xl font-bold text-dark-green sm:text-3xl">
                 Meu perfil
               </h1>
-              <p className="mt-1 font-body text-sm text-ink/60">
-                Personalize como você aparece na página de Integrantes.
-              </p>
             </div>
             <form action={signOut}>
               <button

@@ -6,7 +6,9 @@ const columns = [
   {
     title: "Acompanhe",
     links: [
-      { label: "Newsletter", href: "/#newsletter" },
+      ...(site.newsletterUrl
+        ? [{ label: "Newsletter", href: "/#newsletter" }]
+        : []),
       { label: "Podcast", href: "/podcast" },
     ],
   },

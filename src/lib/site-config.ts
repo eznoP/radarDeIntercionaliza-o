@@ -1,11 +1,22 @@
-export const site = {
+type SiteConfig = {
+  readonly name: string;
+  readonly shortName: string;
+  readonly tagline: string;
+  /**
+   * Newsletter mantida externamente pelo cliente.
+   * Preencha com a URL real para reativar o link na navbar, no rodapé e o
+   * bloco de assinatura na Home. Enquanto for `null`, esses elementos somem.
+   */
+  readonly newsletterUrl: string | null;
+};
+
+export const site: SiteConfig = {
   name: "Radar de Internacionalização",
   shortName: "Radar",
   tagline:
     "Notícias, tendências e casos de comércio exterior e internacionalização.",
-  // Newsletter é mantida externamente pelo cliente (por e-mail).
-  newsletterUrl: "mailto:newsletter@radar.example",
-} as const;
+  newsletterUrl: null,
+};
 
 /** Nome do ícone da marca associado a um link (ver brand-icons.tsx). */
 export type BrandIconName = "globe" | "compass" | "chart" | "plane";
@@ -63,10 +74,15 @@ export const toolLinks: NavLinkItem[] = [
 /**
  * Estrutura da barra de navegação, na ordem exibida.
  * "Sobre nós" e "Ferramentas" são menus expansíveis.
+ * O item "Newsletter" só aparece quando há uma URL configurada.
  */
+const newsletterNav: NavEntry[] = site.newsletterUrl
+  ? [{ label: "Newsletter", href: "/#newsletter" }]
+  : [];
+
 export const navItems: NavEntry[] = [
   { label: "Sobre nós", items: aboutLinks, align: "left" },
-  { label: "Newsletter", href: "/#newsletter" },
+  ...newsletterNav,
   { label: "Podcast", href: "/podcast" },
   { label: "Ferramentas", items: toolLinks, align: "right" },
 ];

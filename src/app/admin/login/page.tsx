@@ -44,9 +44,6 @@ export default async function LoginPage({
           <h1 className="mt-4 font-display text-xl font-semibold text-dark-green">
             Entrar
           </h1>
-          <p className="mt-1 font-body text-sm text-ink/60">
-            Use o seu acesso e senha para continuar.
-          </p>
         </div>
 
         {configured ? (

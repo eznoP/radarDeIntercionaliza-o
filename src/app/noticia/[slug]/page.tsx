@@ -126,17 +126,11 @@ export default async function NoticiaPage({ params }: PageProps) {
             />
           )}
 
-          {html ? (
+          {html && (
             <div
               className="rich-content mt-8 text-[1.02rem]"
               dangerouslySetInnerHTML={{ __html: html }}
             />
-          ) : (
-            !post.videoUrl && (
-              <p className="mt-8 font-body text-sm italic text-ink/50">
-                Esta publicação ainda não tem conteúdo escrito.
-              </p>
-            )
           )}
         </article>
       </main>

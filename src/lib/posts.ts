@@ -1,32 +1,17 @@
 import "server-only";
 
-import { mockPosts } from "@/lib/mock-data";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
-import { slugify } from "@/lib/slugify";
 import type { PostCardData, PostDetail } from "@/lib/post";
 
 /** Reexporta o tipo para quem consome as publicações pelo servidor. */
 export type { PostCardData, PostDetail };
 
-/** Conteúdo de exemplo, usado enquanto o Supabase não está configurado. */
-function fromMock(): PostCardData[] {
-  return mockPosts.map((p) => ({
-    id: p.id,
-    slug: slugify(p.title),
-    title: p.title,
-    category: p.category,
-    image: p.image,
-    isFeatured: Boolean(p.isFeatured),
-    publishedAt: new Date(Date.now() - p.minutesAgo * 60000).toISOString(),
-  }));
-}
-
 /**
  * Publicações publicadas para a Home. Destaques vêm primeiro.
- * Cai no conteúdo de exemplo se o Supabase não estiver configurado.
+ * Sem Supabase configurado, retorna uma lista vazia.
  */
 export async function getPublishedPosts(limit = 12): Promise<PostCardData[]> {
-  if (!isSupabaseConfigured()) return fromMock();
+  if (!isSupabaseConfigured()) return [];
 
   try {
     const supabase = await createClient();
@@ -40,7 +25,7 @@ export async function getPublishedPosts(limit = 12): Promise<PostCardData[]> {
       .order("published_at", { ascending: false, nullsFirst: false })
       .limit(limit);
 
-    if (error) return fromMock();
+    if (error) return [];
 
     const { data: categories } = await supabase
       .from("categories")
@@ -57,42 +42,8 @@ export async function getPublishedPosts(limit = 12): Promise<PostCardData[]> {
       publishedAt: row.published_at,
     }));
   } catch {
-    return fromMock();
+    return [];
   }
-}
-
-/** Publicação de exemplo (fallback sem Supabase) pelo slug. */
-function mockDetailBySlug(slug: string): PostDetail | null {
-  const p = mockPosts.find((m) => slugify(m.title) === slug);
-  if (!p) return null;
-  return {
-    id: p.id,
-    slug,
-    title: p.title,
-    excerpt:
-      "Conteúdo de exemplo exibido enquanto o Supabase não está configurado.",
-    content: {
-      type: "doc",
-      content: [
-        {
-          type: "paragraph",
-          content: [
-            {
-              type: "text",
-              text: "Este é um conteúdo de exemplo. Assim que o Supabase estiver configurado, o texto escrito no painel aparecerá aqui.",
-            },
-          ],
-        },
-      ],
-    },
-    coverImage: p.image,
-    videoUrl: null,
-    category: p.category,
-    authorName: "Equipe Radar",
-    authorRole: null,
-    publishedAt: new Date(Date.now() - p.minutesAgo * 60000).toISOString(),
-    isFeatured: Boolean(p.isFeatured),
-  };
 }
 
 /**
@@ -100,7 +51,7 @@ function mockDetailBySlug(slug: string): PostDetail | null {
  * Retorna null se não existir (ou não estiver visível para o visitante).
  */
 export async function getPostBySlug(slug: string): Promise<PostDetail | null> {
-  if (!isSupabaseConfigured()) return mockDetailBySlug(slug);
+  if (!isSupabaseConfigured()) return null;
 
   try {
     const supabase = await createClient();
@@ -150,6 +101,6 @@ export async function getPostBySlug(slug: string): Promise<PostDetail | null> {
       isFeatured: row.is_featured,
     };
   } catch {
-    return mockDetailBySlug(slug);
+    return null;
   }
 }

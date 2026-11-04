@@ -138,35 +138,27 @@ export default async function AdminHome() {
 
   const warnings: { text: string; href?: string }[] = [];
   if (!isSupabaseConfigured()) {
-    warnings.push({
-      text: "O Supabase ainda não está configurado. Preencha o .env.local com a URL e as chaves e reinicie o servidor.",
-    });
+    warnings.push({ text: "Supabase não configurado (.env.local)." });
   }
   if (isAdmin && !isAdminConfigured()) {
     warnings.push({
-      text: "A chave secreta (SUPABASE_SERVICE_ROLE_KEY) não está configurada. Sem ela não é possível criar ou gerenciar os acessos dos integrantes.",
+      text: "Chave secreta (SUPABASE_SERVICE_ROLE_KEY) ausente.",
     });
   }
   if (isAdmin && pendingProfiles > 0) {
     warnings.push({
       text:
         pendingProfiles === 1
-          ? "1 perfil de integrante aguardando aprovação."
-          : `${pendingProfiles} perfis de integrantes aguardando aprovação.`,
+          ? "1 perfil aguardando aprovação."
+          : `${pendingProfiles} perfis aguardando aprovação.`,
       href: "/admin/integrantes?filtro=pending",
     });
   }
   if (categories === 0) {
-    warnings.push({
-      text: isAdmin
-        ? "Nenhuma categoria cadastrada. Crie ao menos uma para poder publicar."
-        : "Ainda não há categorias cadastradas. Peça ao gestor para criar uma antes de publicar.",
-    });
+    warnings.push({ text: "Nenhuma categoria cadastrada." });
   }
   if (isAdmin && integrantes === 0) {
-    warnings.push({
-      text: "Nenhum integrante cadastrado. Cadastre um autor(a) para vincular às publicações.",
-    });
+    warnings.push({ text: "Nenhum integrante cadastrado." });
   }
 
   return (
@@ -246,46 +238,24 @@ export default async function AdminHome() {
           Atalhos
         </h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <QuickLink
-            href="/admin/publicacoes/nova"
-            title="Criar publicação"
-            description="Título, resumo, conteúdo e mídia."
-          />
+          <QuickLink href="/admin/publicacoes/nova" title="Criar publicação" />
           {isAdmin ? (
             <>
               <QuickLink
                 href="/admin/integrantes/novo"
                 title="Cadastrar integrante"
-                description="Pessoas do projeto e acesso ao painel."
               />
-              <QuickLink
-                href="/admin/categorias"
-                title="Gerenciar categorias"
-                description="Área exclusiva das categorias."
-              />
-              <QuickLink
-                href="/admin/cargos"
-                title="Gerenciar cargos"
-                description="Área exclusiva dos cargos."
-              />
+              <QuickLink href="/admin/categorias" title="Gerenciar categorias" />
+              <QuickLink href="/admin/cargos" title="Gerenciar cargos" />
             </>
           ) : (
             <>
               <QuickLink
                 href="/admin/publicacoes"
                 title="Minhas publicações"
-                description="Edite ou remova os seus conteúdos."
               />
-              <QuickLink
-                href="/meu-perfil"
-                title="Meu perfil"
-                description="Foto, cargo, descrição e contatos."
-              />
-              <QuickLink
-                href="/integrantes"
-                title="Ver a equipe"
-                description="Página pública de integrantes."
-              />
+              <QuickLink href="/meu-perfil" title="Meu perfil" />
+              <QuickLink href="/integrantes" title="Ver a equipe" />
             </>
           )}
         </div>
@@ -294,25 +264,14 @@ export default async function AdminHome() {
   );
 }
 
-function QuickLink({
-  href,
-  title,
-  description,
-}: {
-  href: string;
-  title: string;
-  description: string;
-}) {
+function QuickLink({ href, title }: { href: string; title: string }) {
   return (
     <Link
       href={href}
       className="flex items-center justify-between gap-3 rounded-xl border border-dark-green/10 bg-cream/60 px-4 py-3 transition hover:border-moss hover:bg-moss/10"
     >
-      <span>
-        <span className="block font-display text-sm font-semibold text-dark-green">
-          {title}
-        </span>
-        <span className="block font-body text-xs text-ink/55">{description}</span>
+      <span className="font-display text-sm font-semibold text-dark-green">
+        {title}
       </span>
       <ArrowRight className="h-4 w-4 shrink-0 text-ink/40" />
     </Link>

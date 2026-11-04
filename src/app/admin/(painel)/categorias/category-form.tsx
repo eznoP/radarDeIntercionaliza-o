@@ -45,7 +45,7 @@ export function CategoryForm({
       <Field
         label="Descrição"
         htmlFor="description"
-        hint="Opcional. Aparece como apoio na listagem."
+        hint="Opcional."
       >
         <textarea
           id="description"
@@ -60,7 +60,7 @@ export function CategoryForm({
       <Field
         label="Ordem"
         htmlFor="sort_order"
-        hint="Número menor aparece primeiro. Opcional."
+        hint="Opcional."
       >
         <input
           id="sort_order"

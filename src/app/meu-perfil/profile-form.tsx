@@ -51,7 +51,7 @@ export function ProfileForm({
       <Field
         label="Cargo"
         htmlFor="role_id"
-        hint="Você pode escolher entre os cargos já cadastrados."
+        hint="Opcional."
       >
         <select
           id="role_id"
@@ -71,7 +71,7 @@ export function ProfileForm({
       <Field
         label="Descrição"
         htmlFor="bio"
-        hint="Uma breve apresentação sobre você (opcional)."
+        hint="Opcional."
       >
         <textarea
           id="bio"

@@ -79,7 +79,6 @@ export default async function IntegrantesPage({
     <>
       <AdminPageHeader
         title="Integrantes"
-        description="Pessoas do projeto. Aprove os perfis para que apareçam no site."
         action={
           <Link
             href="/admin/integrantes/novo"

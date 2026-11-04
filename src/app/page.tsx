@@ -46,30 +46,6 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* ===================== Slot da foto do grupo =====================
-            Mantido vazio por enquanto. Quando a foto chegar, troque o bloco
-            interno por: <Image src="/brand/foto-grupo.webp" alt="Foto do
-            grupo" fill className="object-cover" /> dentro de um wrapper
-            relativo full-width — assim ela preenche toda a lateral do site. */}
-        <section
-          aria-label="Espaço reservado para a foto do grupo"
-          className="relative w-full overflow-hidden border-y border-dark-green/10 bg-sand"
-        >
-          <div className="relative flex h-[42vw] max-h-[560px] min-h-[220px] w-full items-center justify-center">
-            <Image
-              aria-hidden
-              alt=""
-              src="/brand/astrolabe.webp"
-              width={389}
-              height={367}
-              className="pointer-events-none absolute h-[68%] w-auto opacity-[0.06] brightness-0 select-none"
-            />
-            <span className="relative font-display text-[11px] uppercase tracking-[0.3em] text-dark-green/40">
-              Foto do grupo em breve
-            </span>
-          </div>
-        </section>
-
         {/* ===================== Últimas postagens ===================== */}
         <section className="mx-auto w-full max-w-[1400px] px-5 py-14 sm:px-8 sm:py-16">
           <div className="mb-6 flex items-end justify-between gap-4 border-b border-dark-green/15 pb-3">
@@ -91,34 +67,36 @@ export default async function HomePage() {
         </section>
 
         {/* ===================== Newsletter (link externo) ===================== */}
-        <section
-          id="newsletter"
-          className="relative scroll-mt-24 overflow-hidden bg-moss/15"
-        >
-          <Image
-            aria-hidden
-            alt=""
-            src="/brand/compass-rose.webp"
-            width={608}
-            height={608}
-            className="pointer-events-none absolute -left-20 top-1/2 w-[340px] -translate-y-1/2 opacity-[0.07] brightness-0 select-none"
-          />
-          <div className="relative mx-auto w-full max-w-[1400px] px-5 py-16 text-center sm:px-8">
-            <h2 className="font-display text-2xl font-semibold text-dark-green sm:text-3xl">
-              Receba a nossa newsletter
-            </h2>
-            <p className="mx-auto mt-3 max-w-xl font-body text-sm text-ink/75 sm:text-base">
-              Novidades de comércio exterior e internacionalização direto no seu
-              e-mail.
-            </p>
-            <a
-              href={site.newsletterUrl}
-              className="mt-7 inline-flex items-center rounded-full bg-dark-green px-7 py-3.5 font-display text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-moss hover:shadow-lg active:translate-y-0 active:scale-95"
-            >
-              Assinar newsletter
-            </a>
-          </div>
-        </section>
+        {site.newsletterUrl && (
+          <section
+            id="newsletter"
+            className="relative scroll-mt-24 overflow-hidden bg-moss/15"
+          >
+            <Image
+              aria-hidden
+              alt=""
+              src="/brand/compass-rose.webp"
+              width={608}
+              height={608}
+              className="pointer-events-none absolute -left-20 top-1/2 w-[340px] -translate-y-1/2 opacity-[0.07] brightness-0 select-none"
+            />
+            <div className="relative mx-auto w-full max-w-[1400px] px-5 py-16 text-center sm:px-8">
+              <h2 className="font-display text-2xl font-semibold text-dark-green sm:text-3xl">
+                Receba a nossa newsletter
+              </h2>
+              <p className="mx-auto mt-3 max-w-xl font-body text-sm text-ink/75 sm:text-base">
+                Novidades de comércio exterior e internacionalização direto no
+                seu e-mail.
+              </p>
+              <a
+                href={site.newsletterUrl}
+                className="mt-7 inline-flex items-center rounded-full bg-dark-green px-7 py-3.5 font-display text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-moss hover:shadow-lg active:translate-y-0 active:scale-95"
+              >
+                Assinar newsletter
+              </a>
+            </div>
+          </section>
+        )}
       </main>
 
       <SiteFooter />

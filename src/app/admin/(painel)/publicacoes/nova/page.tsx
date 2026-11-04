@@ -33,11 +33,6 @@ export default async function NovaPublicacaoPage() {
     <>
       <AdminPageHeader
         title="Nova publicação"
-        description={
-          isAdmin
-            ? "Preencha os campos obrigatórios. Foto e vídeo são opcionais."
-            : "Preencha os campos obrigatórios. A publicação entra no seu nome."
-        }
         action={
           <Link
             href="/admin/publicacoes"

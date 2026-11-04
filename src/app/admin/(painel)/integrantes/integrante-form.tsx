@@ -106,7 +106,7 @@ export function IntegranteForm({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Cargo" htmlFor="role_id" hint="Defina os cargos na área “Cargos”.">
+        <Field label="Cargo" htmlFor="role_id">
           <select
             id="role_id"
             name="role_id"
@@ -161,7 +161,7 @@ export function IntegranteForm({
       <Field
         label="Biografia"
         htmlFor="bio"
-        hint="Opcional. Aparece no perfil público do integrante."
+        hint="Opcional."
       >
         <textarea
           id="bio"
@@ -181,7 +181,7 @@ export function IntegranteForm({
           folder="integrantes"
           defaultValue={integrante?.avatar_url}
           label="Foto de perfil"
-          hint="Opcional. Será convertida para .webp."
+          hint="Opcional."
         />
       </div>
 
@@ -193,7 +193,6 @@ export function IntegranteForm({
         <Field
           label="Situação do perfil"
           htmlFor="status"
-          hint="Só perfis “Aprovado” aparecem na página pública de Integrantes e têm acesso ao painel para publicar."
         >
           <select
             id="status"
@@ -237,7 +236,6 @@ export function IntegranteForm({
             htmlFor="password"
             required
             error={state.fieldErrors?.password}
-            hint="O integrante poderá alterá-la depois, em “Meu perfil”."
           >
             <input
               id="password"

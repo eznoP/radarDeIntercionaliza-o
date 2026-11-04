@@ -28,10 +28,7 @@ export default async function CategoriasPage({
 
   return (
     <>
-      <AdminPageHeader
-        title="Categorias"
-        description="Área exclusiva para as categorias das publicações."
-      />
+      <AdminPageHeader title="Categorias" />
       <AdminAlert ok={ok} erro={erro} />
 
       <div className="grid gap-6 lg:grid-cols-[340px_1fr]">

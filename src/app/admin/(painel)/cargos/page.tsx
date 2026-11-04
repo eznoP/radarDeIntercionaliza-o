@@ -28,10 +28,7 @@ export default async function CargosPage({
 
   return (
     <>
-      <AdminPageHeader
-        title="Cargos"
-        description="Área exclusiva para os cargos dos integrantes."
-      />
+      <AdminPageHeader title="Cargos" />
       <AdminAlert ok={ok} erro={erro} />
 
       <div className="grid gap-6 lg:grid-cols-[340px_1fr]">

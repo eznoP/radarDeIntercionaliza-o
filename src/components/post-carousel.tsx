@@ -41,7 +41,7 @@ export function PostCarousel({ posts }: { posts: PostCardData[] }) {
   if (posts.length === 0) {
     return (
       <p className="rounded-card border border-dashed border-dark-green/20 bg-sand/50 px-6 py-12 text-center font-body text-sm text-ink/55">
-        Nenhuma publicação por aqui ainda. Volte em breve!
+        Nenhuma publicação ainda.
       </p>
     );
   }

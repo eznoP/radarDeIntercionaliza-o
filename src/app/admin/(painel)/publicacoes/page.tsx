@@ -83,11 +83,7 @@ export default async function PublicacoesPage({
     <>
       <AdminPageHeader
         title="Publicações"
-        description={
-          isAdmin
-            ? "Notícias e conteúdos do site. Destaques aparecem na Home."
-            : "As suas publicações. Você pode criar, editar e excluir apenas os seus conteúdos."
-        }
+        description={isAdmin ? "Notícias e conteúdos do site." : undefined}
         action={
           <Link
             href="/admin/publicacoes/nova"
