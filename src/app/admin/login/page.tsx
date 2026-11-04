@@ -5,7 +5,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/server";
 import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = {
-  title: "Entrar no painel",
+  title: "Entrar",
   robots: { index: false, follow: false },
 };
 
@@ -16,6 +16,7 @@ export default async function LoginPage({
 }) {
   const { redirectTo } = await searchParams;
   const configured = isSupabaseConfigured();
+  const onVercel = Boolean(process.env.VERCEL);
 
   return (
     <main className="relative -mt-16 flex min-h-dvh items-center justify-center overflow-hidden bg-dark-green px-5 py-12 sm:-mt-20">
@@ -41,10 +42,10 @@ export default async function LoginPage({
             />
           </span>
           <h1 className="mt-4 font-display text-xl font-semibold text-dark-green">
-            Painel do gestor
+            Entrar
           </h1>
           <p className="mt-1 font-body text-sm text-ink/60">
-            Entre com sua conta para gerenciar o conteúdo.
+            Use o seu acesso e senha para continuar.
           </p>
         </div>
 
@@ -53,8 +54,19 @@ export default async function LoginPage({
         ) : (
           <div className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800 ring-1 ring-amber-200">
             <strong className="font-semibold">Supabase não configurado.</strong>{" "}
-            Preencha o <code className="font-mono">.env.local</code> com a URL e
-            as chaves do projeto e reinicie o servidor.
+            {onVercel ? (
+              <>
+                Defina <code className="font-mono">NEXT_PUBLIC_SUPABASE_URL</code>{" "}
+                e{" "}
+                <code className="font-mono">NEXT_PUBLIC_SUPABASE_ANON_KEY</code>{" "}
+                nas variáveis de ambiente do projeto e faça um novo deploy.
+              </>
+            ) : (
+              <>
+                Preencha o <code className="font-mono">.env.local</code> com a URL
+                e as chaves do projeto e reinicie o servidor.
+              </>
+            )}
           </div>
         )}
 

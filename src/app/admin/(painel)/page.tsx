@@ -65,6 +65,15 @@ export default async function AdminHome() {
     return total ?? 0;
   })();
 
+  const pendingProfiles = await (async () => {
+    const supabase = await createClient();
+    const { count: total } = await supabase
+      .from("profiles")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "pending");
+    return total ?? 0;
+  })();
+
   const stats = [
     {
       label: "Publicações",
@@ -103,26 +112,35 @@ export default async function AdminHome() {
     },
   ];
 
-  const warnings: string[] = [];
+  const warnings: { text: string; href?: string }[] = [];
   if (!isSupabaseConfigured()) {
-    warnings.push(
-      "O Supabase ainda não está configurado. Preencha o .env.local com a URL e as chaves e reinicie o servidor.",
-    );
+    warnings.push({
+      text: "O Supabase ainda não está configurado. Preencha o .env.local com a URL e as chaves e reinicie o servidor.",
+    });
   }
   if (!isAdminConfigured()) {
-    warnings.push(
-      "A chave secreta (SUPABASE_SERVICE_ROLE_KEY) não está configurada. Sem ela não é possível criar acessos de integrantes.",
-    );
+    warnings.push({
+      text: "A chave secreta (SUPABASE_SERVICE_ROLE_KEY) não está configurada. Sem ela não é possível criar ou gerenciar os acessos dos integrantes.",
+    });
+  }
+  if (pendingProfiles > 0) {
+    warnings.push({
+      text:
+        pendingProfiles === 1
+          ? "1 perfil de integrante aguardando aprovação."
+          : `${pendingProfiles} perfis de integrantes aguardando aprovação.`,
+      href: "/admin/integrantes?filtro=pending",
+    });
   }
   if (categories === 0) {
-    warnings.push(
-      "Nenhuma categoria cadastrada. Crie ao menos uma para poder publicar.",
-    );
+    warnings.push({
+      text: "Nenhuma categoria cadastrada. Crie ao menos uma para poder publicar.",
+    });
   }
   if (integrantes === 0) {
-    warnings.push(
-      "Nenhum integrante cadastrado. Cadastre um autor(a) para vincular às publicações.",
-    );
+    warnings.push({
+      text: "Nenhum integrante cadastrado. Cadastre um autor(a) para vincular às publicações.",
+    });
   }
 
   const firstName = current?.profile?.full_name?.split(" ")[0] ?? "gestor";
@@ -145,14 +163,26 @@ export default async function AdminHome() {
 
       {warnings.length > 0 && (
         <ul className="mb-6 space-y-2">
-          {warnings.map((w) => (
-            <li
-              key={w}
-              className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800 ring-1 ring-amber-200"
-            >
-              {w}
-            </li>
-          ))}
+          {warnings.map((w) =>
+            w.href ? (
+              <li key={w.text}>
+                <Link
+                  href={w.href}
+                  className="flex items-center gap-2 rounded-xl bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800 ring-1 ring-amber-200 transition hover:bg-amber-100"
+                >
+                  <span>{w.text}</span>
+                  <span className="underline">Revisar</span>
+                </Link>
+              </li>
+            ) : (
+              <li
+                key={w.text}
+                className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800 ring-1 ring-amber-200"
+              >
+                {w.text}
+              </li>
+            ),
+          )}
         </ul>
       )}
 

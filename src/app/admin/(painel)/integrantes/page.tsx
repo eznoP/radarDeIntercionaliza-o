@@ -1,36 +1,85 @@
 import Link from "next/link";
-import { Pencil, Plus, ShieldCheck } from "lucide-react";
+import { CheckCircle2, Pencil, Plus, ShieldCheck } from "lucide-react";
 import { AdminAlert } from "@/components/admin/admin-alert";
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { DeleteButton } from "@/components/admin/delete-button";
+import { FormActionButton } from "@/components/admin/form-action-button";
 import { createClient } from "@/lib/supabase/server";
 import { adminConfigured } from "@/lib/admin/guard";
-import { deleteIntegrante } from "./actions";
+import type { ProfileStatus } from "@/lib/database.types";
+import { approveIntegrante, deleteIntegrante } from "./actions";
+import { cn } from "@/lib/utils";
 
 export const metadata = { title: "Integrantes" };
+
+type Filtro = "todos" | ProfileStatus;
+
+const FILTROS: { value: Filtro; label: string }[] = [
+  { value: "todos", label: "Todos" },
+  { value: "pending", label: "Pendentes" },
+  { value: "approved", label: "Aprovados" },
+  { value: "inactive", label: "Inativos" },
+];
+
+const STATUS_STYLE: Record<ProfileStatus, string> = {
+  pending: "bg-amber-100 text-amber-800",
+  approved: "bg-emerald-100 text-emerald-800",
+  inactive: "bg-sand text-ink/50",
+};
+
+const STATUS_LABEL: Record<ProfileStatus, string> = {
+  pending: "Pendente",
+  approved: "Aprovado",
+  inactive: "Inativo",
+};
+
+const ORDER: Record<ProfileStatus, number> = {
+  pending: 0,
+  approved: 1,
+  inactive: 2,
+};
 
 export default async function IntegrantesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ ok?: string; erro?: string }>;
+  searchParams: Promise<{ ok?: string; erro?: string; filtro?: string }>;
 }) {
   if (!adminConfigured()) return null;
-  const { ok, erro } = await searchParams;
+  const { ok, erro, filtro } = await searchParams;
+  const activeFilter: Filtro = (["pending", "approved", "inactive"] as Filtro[]).includes(
+    filtro as Filtro,
+  )
+    ? (filtro as Filtro)
+    : "todos";
+
   const supabase = await createClient();
 
   const [{ data: profiles }, { data: roles }] = await Promise.all([
-    supabase.from("profiles").select("*").order("full_name", { ascending: true }),
+    supabase
+      .from("profiles")
+      .select("*")
+      .order("full_name", { ascending: true }),
     supabase.from("roles").select("id, name"),
   ]);
 
-  const list = profiles ?? [];
+  const all = profiles ?? [];
   const roleName = new Map((roles ?? []).map((r) => [r.id, r.name]));
+  const pendingCount = all.filter((p) => p.status === "pending").length;
+
+  const list = all
+    .filter((p) => activeFilter === "todos" || p.status === activeFilter)
+    .sort((a, b) => {
+      const byStatus = ORDER[a.status] - ORDER[b.status];
+      return byStatus !== 0
+        ? byStatus
+        : a.full_name.localeCompare(b.full_name, "pt-BR");
+    });
 
   return (
     <>
       <AdminPageHeader
         title="Integrantes"
-        description="Pessoas do projeto. Área separada de Cargos e Categorias."
+        description="Pessoas do projeto. Aprove os perfis para que apareçam no site."
         action={
           <Link
             href="/admin/integrantes/novo"
@@ -43,10 +92,47 @@ export default async function IntegrantesPage({
       />
       <AdminAlert ok={ok} erro={erro} />
 
+      {pendingCount > 0 && activeFilter !== "pending" && (
+        <Link
+          href="/admin/integrantes?filtro=pending"
+          className="mb-5 flex items-center gap-2 rounded-xl bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800 ring-1 ring-amber-200 transition hover:bg-amber-100"
+        >
+          <CheckCircle2 className="h-4 w-4" />
+          {pendingCount === 1
+            ? "1 perfil aguardando aprovação."
+            : `${pendingCount} perfis aguardando aprovação.`}
+          <span className="underline">Revisar agora</span>
+        </Link>
+      )}
+
+      <div className="mb-4 flex flex-wrap gap-2">
+        {FILTROS.map((f) => (
+          <Link
+            key={f.value}
+            href={
+              f.value === "todos"
+                ? "/admin/integrantes"
+                : `/admin/integrantes?filtro=${f.value}`
+            }
+            className={cn(
+              "rounded-full px-3.5 py-1.5 font-display text-xs font-semibold transition",
+              activeFilter === f.value
+                ? "bg-dark-green text-white"
+                : "bg-white text-ink/60 ring-1 ring-dark-green/10 hover:bg-cream",
+            )}
+          >
+            {f.label}
+            {f.value === "pending" && pendingCount > 0 ? ` (${pendingCount})` : ""}
+          </Link>
+        ))}
+      </div>
+
       {list.length === 0 ? (
         <div className="rounded-card border border-dark-green/10 bg-white px-5 py-12 text-center shadow-sm">
           <p className="font-body text-sm text-ink/60">
-            Nenhum integrante cadastrado ainda.
+            {activeFilter === "todos"
+              ? "Nenhum integrante cadastrado ainda."
+              : "Nenhum integrante nesta situação."}
           </p>
           <Link
             href="/admin/integrantes/novo"
@@ -62,7 +148,7 @@ export default async function IntegrantesPage({
             {list.map((p) => (
               <li
                 key={p.id}
-                className="flex items-center gap-4 px-4 py-3.5 sm:px-5"
+                className="flex flex-wrap items-center gap-4 px-4 py-3.5 sm:flex-nowrap sm:px-5"
               >
                 <span className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-full bg-sand text-sm font-semibold text-dark-green">
                   {p.avatar_url ? (
@@ -88,14 +174,17 @@ export default async function IntegrantesPage({
                         Gestor
                       </span>
                     )}
-                    {!p.is_active && (
-                      <span className="rounded-full bg-sand px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-ink/50">
-                        Inativo
-                      </span>
-                    )}
+                    <span
+                      className={cn(
+                        "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
+                        STATUS_STYLE[p.status],
+                      )}
+                    >
+                      {STATUS_LABEL[p.status]}
+                    </span>
                   </div>
                   <p className="truncate font-body text-xs text-ink/55">
-                    {p.email ?? "sem e-mail"}
+                    {p.access ? `acesso: ${p.access}` : "sem acesso"}
                     {p.role_id && roleName.has(p.role_id)
                       ? ` · ${roleName.get(p.role_id)}`
                       : ""}
@@ -103,6 +192,16 @@ export default async function IntegrantesPage({
                 </div>
 
                 <div className="flex shrink-0 items-center gap-1">
+                  {p.status === "pending" && (
+                    <FormActionButton
+                      action={approveIntegrante.bind(null, p.id)}
+                      pendingLabel="Aprovando…"
+                      className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                    >
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      Aprovar
+                    </FormActionButton>
+                  )}
                   <Link
                     href={`/admin/integrantes/${p.id}`}
                     className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 font-display text-xs font-semibold text-glaucous transition hover:bg-glaucous/10"

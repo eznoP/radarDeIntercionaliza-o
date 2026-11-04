@@ -1,12 +1,13 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { accessToEmail } from "@/lib/access";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { errorState, type FormState } from "@/lib/admin/types";
 
 const AUTH_MESSAGES: Record<string, string> = {
-  "Invalid login credentials": "E-mail ou senha incorretos.",
-  "Email not confirmed": "Confirme o seu e-mail antes de entrar.",
+  "Invalid login credentials": "Acesso ou senha incorretos.",
+  "Email not confirmed": "Confirme o seu acesso antes de entrar.",
   "Too many requests": "Muitas tentativas. Aguarde alguns instantes.",
 };
 
@@ -16,32 +17,57 @@ export async function signIn(
 ): Promise<FormState> {
   if (!isSupabaseConfigured()) {
     return errorState(
-      "Supabase ainda não configurado. Preencha o arquivo .env.local e reinicie o servidor.",
+      "Supabase ainda não configurado. Fale com o gestor do projeto.",
     );
   }
 
-  const email = String(formData.get("email") ?? "").trim();
+  const access = String(formData.get("access") ?? "").trim();
   const password = String(formData.get("password") ?? "");
 
   const fieldErrors: Record<string, string> = {};
-  if (!email) fieldErrors.email = "Insira o/a e-mail";
+  if (!access) fieldErrors.access = "Insira o/a acesso";
   if (!password) fieldErrors.password = "Insira o/a senha";
   if (Object.keys(fieldErrors).length > 0) {
     return errorState("Preencha os campos destacados.", fieldErrors);
   }
 
+  const email = accessToEmail(access);
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
-  if (error) {
+  if (error || !data.user) {
     return errorState(
-      AUTH_MESSAGES[error.message] ??
+      AUTH_MESSAGES[error?.message ?? ""] ??
         "Não foi possível entrar. Verifique seus dados e tente novamente.",
     );
   }
 
-  const redirectTo = String(formData.get("redirectTo") ?? "/admin");
-  redirect(redirectTo.startsWith("/admin") ? redirectTo : "/admin");
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("is_admin, status")
+    .eq("user_id", data.user.id)
+    .maybeSingle();
+
+  if (profile?.status === "inactive") {
+    await supabase.auth.signOut();
+    return errorState(
+      "Este acesso está inativo. Fale com o gestor do projeto para reativá-lo.",
+    );
+  }
+
+  const requested = String(formData.get("redirectTo") ?? "");
+
+  // Gestor master -> painel. Integrante comum -> área do próprio perfil.
+  if (profile?.is_admin) {
+    redirect(requested.startsWith("/admin") && requested !== "/admin/login"
+      ? requested
+      : "/admin");
+  }
+
+  redirect("/meu-perfil");
 }
 
 export async function signOut() {

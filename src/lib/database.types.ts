@@ -14,6 +14,9 @@ export type Json =
 
 export type PostStatus = "draft" | "published" | "archived";
 
+/** Situação do perfil do integrante no site. */
+export type ProfileStatus = "pending" | "approved" | "inactive";
+
 export type Database = {
   public: {
     Tables: {
@@ -119,12 +122,15 @@ export type Database = {
           user_id: string | null;
           full_name: string;
           email: string | null;
+          access: string | null;
           slug: string;
           role_id: string | null;
           bio: string | null;
           avatar_url: string | null;
           linkedin_url: string | null;
           lattes_url: string | null;
+          website_url: string | null;
+          status: ProfileStatus;
           is_active: boolean;
           is_admin: boolean;
           created_at: string;
@@ -135,12 +141,15 @@ export type Database = {
           user_id?: string | null;
           full_name: string;
           email?: string | null;
+          access?: string | null;
           slug: string;
           role_id?: string | null;
           bio?: string | null;
           avatar_url?: string | null;
           linkedin_url?: string | null;
           lattes_url?: string | null;
+          website_url?: string | null;
+          status?: ProfileStatus;
           is_active?: boolean;
           is_admin?: boolean;
           created_at?: string;
@@ -151,12 +160,15 @@ export type Database = {
           user_id?: string | null;
           full_name?: string;
           email?: string | null;
+          access?: string | null;
           slug?: string;
           role_id?: string | null;
           bio?: string | null;
           avatar_url?: string | null;
           linkedin_url?: string | null;
           lattes_url?: string | null;
+          website_url?: string | null;
+          status?: ProfileStatus;
           is_active?: boolean;
           is_admin?: boolean;
           created_at?: string;
@@ -212,6 +224,7 @@ export type Database = {
     };
     Enums: {
       post_status: PostStatus;
+      profile_status: ProfileStatus;
     };
     CompositeTypes: { [_ in never]: never };
   };

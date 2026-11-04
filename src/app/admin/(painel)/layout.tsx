@@ -20,13 +20,9 @@ export default async function PainelLayout({
   const current = await getCurrentProfile();
   if (!current) redirect("/admin/login");
 
+  // Integrantes comuns personalizam o próprio perfil em /meu-perfil.
   if (!current.profile?.is_admin) {
-    return (
-      <AdminNotice
-        title="Acesso restrito"
-        description="A sua conta está autenticada, mas não tem permissão de gestor. Peça a um administrador para liberar o seu acesso."
-      />
-    );
+    redirect("/meu-perfil");
   }
 
   return (

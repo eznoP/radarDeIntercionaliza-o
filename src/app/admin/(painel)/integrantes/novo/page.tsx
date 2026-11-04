@@ -19,7 +19,7 @@ export default async function NovoIntegrantePage() {
     <>
       <AdminPageHeader
         title="Novo integrante"
-        description="Cadastre uma pessoa do projeto e, se quiser, libere o acesso ao painel."
+        description="Cadastre uma pessoa do projeto e, se quiser, crie o acesso dela (acesso + senha)."
         action={
           <Link
             href="/admin/integrantes"

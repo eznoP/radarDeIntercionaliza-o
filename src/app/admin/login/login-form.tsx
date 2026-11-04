@@ -14,29 +14,31 @@ export function LoginForm({ redirectTo }: { redirectTo?: string }) {
 
       <div className="space-y-1.5">
         <label
-          htmlFor="email"
+          htmlFor="access"
           className="font-display text-sm font-medium text-dark-green"
         >
-          E-mail
+          Acesso
         </label>
         <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          placeholder="voce@exemplo.com"
-          aria-invalid={Boolean(state.fieldErrors?.email)}
+          id="access"
+          name="access"
+          type="text"
+          autoComplete="username"
+          autoCapitalize="none"
+          spellCheck={false}
+          placeholder="seu.acesso"
+          aria-invalid={Boolean(state.fieldErrors?.access)}
           className={cn(
             "w-full rounded-xl border bg-white px-4 py-3 font-body text-sm text-ink outline-none transition",
             "placeholder:text-ink/35 focus:ring-2 focus:ring-moss/40",
-            state.fieldErrors?.email
+            state.fieldErrors?.access
               ? "border-red-400 focus:border-red-400"
               : "border-dark-green/15 focus:border-moss",
           )}
         />
-        {state.fieldErrors?.email && (
+        {state.fieldErrors?.access && (
           <p className="text-xs font-medium text-red-600">
-            {state.fieldErrors.email}
+            {state.fieldErrors.access}
           </p>
         )}
       </div>
@@ -84,7 +86,7 @@ export function LoginForm({ redirectTo }: { redirectTo?: string }) {
         disabled={pending}
         className="inline-flex w-full items-center justify-center rounded-xl bg-dark-green px-6 py-3.5 font-display text-sm font-semibold text-white shadow-sm transition duration-200 hover:bg-moss hover:shadow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {pending ? "Entrando…" : "Entrar no painel"}
+        {pending ? "Entrando…" : "Entrar"}
       </button>
     </form>
   );

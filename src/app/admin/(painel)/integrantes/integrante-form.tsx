@@ -2,43 +2,55 @@
 
 import { useActionState, useState, useTransition } from "react";
 import { useFormStatus } from "react-dom";
-import { Loader2, ShieldCheck } from "lucide-react";
+import { KeyRound, Loader2 } from "lucide-react";
 import { MediaUploader } from "@/components/admin/media-uploader";
 import { Field, fieldInputClass } from "@/components/admin/fields";
 import { FormMessage } from "@/components/admin/form-message";
 import { initialFormState } from "@/lib/admin/types";
-import type { Tables } from "@/lib/database.types";
-import { checkIntegranteEmail, createIntegrante, updateIntegrante } from "./actions";
+import { ACCESS_HINT } from "@/lib/access";
+import type { ProfileStatus, Tables } from "@/lib/database.types";
+import {
+  checkIntegranteAccess,
+  createIntegrante,
+  updateIntegrante,
+} from "./actions";
 
 type Integrante = Tables<"profiles">;
+
+const STATUS_OPTIONS: { value: ProfileStatus; label: string }[] = [
+  { value: "pending", label: "Pendente (não aparece no site)" },
+  { value: "approved", label: "Aprovado (aparece no site)" },
+  { value: "inactive", label: "Inativo (oculto, sem excluir)" },
+];
 
 export function IntegranteForm({
   integrante,
   roles,
+  isSelf = false,
 }: {
   integrante?: Integrante;
   roles: Pick<Tables<"roles">, "id" | "name">[];
+  isSelf?: boolean;
 }) {
   const action = integrante
     ? updateIntegrante.bind(null, integrante.id)
     : createIntegrante;
   const [state, formAction] = useActionState(action, initialFormState);
 
-  const [emailWarning, setEmailWarning] = useState<string | null>(null);
+  const [accessWarning, setAccessWarning] = useState<string | null>(null);
   const [checking, startCheck] = useTransition();
+  const alreadyHasAccess = Boolean(integrante?.user_id);
   const [grantAccess, setGrantAccess] = useState(
-    Boolean(integrante?.is_admin),
+    alreadyHasAccess || isSelf,
   );
 
-  const alreadyHasAccess = Boolean(integrante?.user_id);
-
-  const handleEmailBlur = (value: string) => {
-    if (!value.trim()) return setEmailWarning(null);
+  const handleAccessBlur = (value: string) => {
+    if (!value.trim()) return setAccessWarning(null);
     startCheck(async () => {
-      const res = await checkIntegranteEmail(value, integrante?.id);
-      setEmailWarning(
+      const res = await checkIntegranteAccess(value, integrante?.id);
+      setAccessWarning(
         res.exists
-          ? `Atenção: já existe um integrante com este e-mail (${res.name}).`
+          ? `Atenção: já existe um integrante com este acesso (${res.name}).`
           : null,
       );
     });
@@ -47,6 +59,14 @@ export function IntegranteForm({
   return (
     <form action={formAction} className="space-y-5">
       <FormMessage state={state} />
+
+      {isSelf && (
+        <p className="rounded-xl bg-moss/10 px-4 py-3 font-body text-sm text-dark-green ring-1 ring-moss/25">
+          Você está editando o seu próprio perfil de <strong>gestor master</strong>.
+          O seu acesso e a sua permissão de administrador não podem ser removidos
+          por aqui.
+        </p>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Field
@@ -65,21 +85,21 @@ export function IntegranteForm({
         </Field>
 
         <Field
-          label="E-mail"
-          htmlFor="email"
-          required
-          error={state.fieldErrors?.email ?? emailWarning ?? undefined}
-          hint={checking ? "Verificando…" : undefined}
+          label="Acesso"
+          htmlFor="access"
+          error={state.fieldErrors?.access ?? accessWarning ?? undefined}
+          hint={checking ? "Verificando…" : "Nome usado para entrar (login)."}
         >
           <input
-            id="email"
-            name="email"
-            type="email"
-            defaultValue={integrante?.email ?? ""}
-            placeholder="maria@exemplo.com"
-            onBlur={(e) => handleEmailBlur(e.target.value)}
+            id="access"
+            name="access"
+            defaultValue={integrante?.access ?? ""}
+            placeholder="maria.silva"
+            autoCapitalize="none"
+            spellCheck={false}
+            onBlur={(e) => handleAccessBlur(e.target.value)}
             className={fieldInputClass(
-              Boolean(state.fieldErrors?.email || emailWarning),
+              Boolean(state.fieldErrors?.access || accessWarning),
             )}
           />
         </Field>
@@ -125,6 +145,17 @@ export function IntegranteForm({
             className={fieldInputClass(false)}
           />
         </Field>
+
+        <Field label="Site / contato" htmlFor="website_url" hint="Opcional.">
+          <input
+            id="website_url"
+            name="website_url"
+            type="url"
+            defaultValue={integrante?.website_url ?? ""}
+            placeholder="https://…"
+            className={fieldInputClass(false)}
+          />
+        </Field>
       </div>
 
       <Field
@@ -159,21 +190,26 @@ export function IntegranteForm({
           Situação e acesso
         </legend>
 
-        <label className="flex items-start gap-3">
-          <input
-            type="checkbox"
-            name="is_active"
-            defaultChecked={integrante ? integrante.is_active : true}
-            className="mt-0.5 h-4 w-4 accent-moss"
-          />
-          <span className="font-body text-sm text-ink/80">
-            <span className="font-display font-medium text-dark-green">
-              Integrante ativo
-            </span>
-            <br />
-            Desmarque para ocultá-lo do site sem excluir.
-          </span>
-        </label>
+        <Field
+          label="Situação do perfil"
+          htmlFor="status"
+          hint="Só perfis “Aprovado” aparecem na página pública de Integrantes."
+        >
+          <select
+            id="status"
+            name="status"
+            defaultValue={isSelf ? "approved" : (integrante?.status ?? "pending")}
+            disabled={isSelf}
+            className={fieldInputClass(false)}
+          >
+            {STATUS_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          {isSelf && <input type="hidden" name="status" value="approved" />}
+        </Field>
 
         <label className="flex items-start gap-3">
           <input
@@ -181,25 +217,27 @@ export function IntegranteForm({
             name="grant_access"
             checked={grantAccess}
             onChange={(e) => setGrantAccess(e.target.checked)}
-            className="mt-0.5 h-4 w-4 accent-moss"
+            disabled={isSelf}
+            className="mt-0.5 h-4 w-4 accent-moss disabled:opacity-60"
           />
           <span className="font-body text-sm text-ink/80">
             <span className="flex items-center gap-1.5 font-display font-medium text-dark-green">
-              <ShieldCheck className="h-4 w-4" />
-              Acesso ao painel do gestor
+              <KeyRound className="h-4 w-4" />
+              Dar acesso (login próprio)
             </span>
             <br />
-            Permite que este integrante entre no painel e gerencie o conteúdo.
+            O integrante entra com o “acesso” e a senha para personalizar o
+            próprio perfil. <strong>Não</strong> dá acesso ao painel do gestor.
           </span>
         </label>
 
-        {grantAccess && !alreadyHasAccess && (
+        {grantAccess && !alreadyHasAccess && !isSelf && (
           <Field
             label="Senha inicial"
             htmlFor="password"
             required
             error={state.fieldErrors?.password}
-            hint="O integrante poderá alterá-la depois."
+            hint="O integrante poderá alterá-la depois, em “Meu perfil”."
           >
             <input
               id="password"
@@ -213,8 +251,27 @@ export function IntegranteForm({
         )}
 
         {grantAccess && alreadyHasAccess && (
+          <Field
+            label="Redefinir senha"
+            htmlFor="password"
+            error={state.fieldErrors?.password}
+            hint="Deixe em branco para manter a senha atual."
+          >
+            <input
+              id="password"
+              name="password"
+              type="text"
+              autoComplete="new-password"
+              placeholder="Nova senha (opcional)"
+              className={fieldInputClass(Boolean(state.fieldErrors?.password))}
+            />
+          </Field>
+        )}
+
+        {alreadyHasAccess && (
           <p className="rounded-lg bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-800 ring-1 ring-emerald-200">
-            Esta conta já possui acesso ao painel.
+            Este integrante já possui acesso. O “acesso” acima é o nome de login
+            dele.
           </p>
         )}
 

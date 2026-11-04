@@ -6,6 +6,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Só roda no painel — mantém o site público rápido e estático.
-  matcher: ["/admin/:path*"],
+  // Só roda nas áreas que exigem login — mantém o site público rápido e estático.
+  matcher: ["/admin/:path*", "/meu-perfil/:path*"],
 };

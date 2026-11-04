@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/page-header";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentProfile } from "@/lib/supabase/server";
 import { adminConfigured } from "@/lib/admin/guard";
 import { IntegranteForm } from "../integrante-form";
 
@@ -17,12 +17,13 @@ export default async function EditarIntegrantePage({
   const { id } = await params;
   const supabase = await createClient();
 
-  const [{ data: integrante }, { data: roles }] = await Promise.all([
+  const [{ data: integrante }, { data: roles }, current] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", id).maybeSingle(),
     supabase
       .from("roles")
       .select("id, name")
       .order("sort_order", { ascending: true }),
+    getCurrentProfile(),
   ]);
 
   if (!integrante) notFound();
@@ -43,7 +44,11 @@ export default async function EditarIntegrantePage({
         }
       />
       <div className="max-w-3xl rounded-card border border-dark-green/10 bg-white p-6 shadow-sm">
-        <IntegranteForm integrante={integrante} roles={roles ?? []} />
+        <IntegranteForm
+          integrante={integrante}
+          roles={roles ?? []}
+          isSelf={integrante.id === current?.profile?.id}
+        />
       </div>
     </>
   );
