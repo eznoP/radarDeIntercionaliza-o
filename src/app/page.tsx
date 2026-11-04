@@ -5,10 +5,11 @@ import { SiteFooter } from "@/components/site-footer";
 import { PostCarousel } from "@/components/post-carousel";
 import { BackToTop } from "@/components/back-to-top";
 import { GlobeGrid } from "@/components/brand-icons";
-import { mockPosts } from "@/lib/mock-data";
+import { getPublishedPosts } from "@/lib/posts";
 import { site } from "@/lib/site-config";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const posts = await getPublishedPosts();
   return (
     <>
       <SiteHeader />
@@ -86,7 +87,7 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <PostCarousel posts={mockPosts} />
+          <PostCarousel posts={posts} />
         </section>
 
         {/* ===================== Newsletter (link externo) ===================== */}

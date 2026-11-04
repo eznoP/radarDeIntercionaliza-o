@@ -4,9 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PostCard } from "@/components/post-card";
 import { cn } from "@/lib/utils";
-import type { Post } from "@/lib/mock-data";
+import type { PostCardData } from "@/lib/post";
 
-export function PostCarousel({ posts }: { posts: Post[] }) {
+export function PostCarousel({ posts }: { posts: PostCardData[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
@@ -37,6 +37,14 @@ export function PostCarousel({ posts }: { posts: Post[] }) {
     const amount = (firstCard?.offsetWidth ?? 280) + 16;
     el.scrollBy({ left: direction * amount * 2, behavior: "smooth" });
   };
+
+  if (posts.length === 0) {
+    return (
+      <p className="rounded-card border border-dashed border-dark-green/20 bg-sand/50 px-6 py-12 text-center font-body text-sm text-ink/55">
+        Nenhuma publicação por aqui ainda. Volte em breve!
+      </p>
+    );
+  }
 
   return (
     <div className="relative">
