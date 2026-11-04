@@ -16,13 +16,30 @@ const xmind = localFont({
   display: "swap",
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+const siteDescription =
+  "Notícias, tendências e casos de comércio exterior e internacionalização.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Radar de Internacionalização",
     template: "%s · Radar de Internacionalização",
   },
-  description:
-    "Notícias, tendências e casos de comércio exterior e internacionalização.",
+  description: siteDescription,
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    siteName: "Radar de Internacionalização",
+    title: "Radar de Internacionalização",
+    description: siteDescription,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Radar de Internacionalização",
+    description: siteDescription,
+  },
 };
 
 export default function RootLayout({

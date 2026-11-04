@@ -13,17 +13,27 @@ const columns = [
   {
     title: "Saiba mais",
     links: [
-      { label: "Sobre nós", href: "/sobre-nos" },
-      { label: "Integrantes", href: "/sobre-nos#integrantes" },
-      { label: "Radar de internacionalização", href: "/radar-de-tendencias" },
+      { label: "Sobre o projeto", href: "/sobre-o-projeto" },
+      { label: "Integrantes", href: "/integrantes" },
+      { label: "Radar de tendências", href: "/radar-de-tendencias" },
     ],
   },
 ];
 
 export function SiteFooter() {
   return (
-    <footer className="bg-dark-green text-white">
-      <div className="mx-auto w-full max-w-[1400px] px-5 py-12 sm:px-8">
+    <footer className="relative overflow-hidden bg-dark-green text-white">
+      {/* Marca-d'água: astrolábio */}
+      <Image
+        aria-hidden
+        alt=""
+        src="/brand/astrolabe.webp"
+        width={389}
+        height={367}
+        className="pointer-events-none absolute -right-10 -top-6 w-[420px] opacity-[0.07] select-none"
+      />
+
+      <div className="relative mx-auto w-full max-w-[1400px] px-5 py-12 sm:px-8">
         {/* Divisória com o logo centralizado */}
         <div className="flex items-center gap-4">
           <span className="h-px flex-1 bg-white/25" />

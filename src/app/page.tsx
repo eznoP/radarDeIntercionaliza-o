@@ -1,8 +1,10 @@
+import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { PostCarousel } from "@/components/post-carousel";
 import { BackToTop } from "@/components/back-to-top";
+import { GlobeGrid } from "@/components/brand-icons";
 import { mockPosts } from "@/lib/mock-data";
 import { site } from "@/lib/site-config";
 
@@ -13,8 +15,23 @@ export default function HomePage() {
 
       <main>
         {/* ===================== Título ===================== */}
-        <section className="bg-dark-green text-white">
-          <div className="mx-auto w-full max-w-[1400px] px-5 pt-12 pb-10 text-center sm:px-8 sm:pt-16">
+        <section className="relative overflow-hidden bg-dark-green text-white">
+          {/* Brilho suave da marca */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_80%_at_75%_35%,rgba(122,148,69,0.28),transparent_70%)]"
+          />
+          {/* Marca-d'água: rosa dos ventos */}
+          <Image
+            aria-hidden
+            alt=""
+            src="/brand/compass-rose.webp"
+            width={608}
+            height={608}
+            className="pointer-events-none absolute -right-20 top-1/2 hidden w-[520px] -translate-y-1/2 opacity-[0.12] select-none sm:block"
+          />
+
+          <div className="relative mx-auto w-full max-w-[1400px] px-5 pt-12 pb-10 text-center sm:px-8 sm:pt-16">
             <p className="font-display text-[11px] font-semibold uppercase tracking-[0.35em] text-vanilla/75">
               {site.name}
             </p>
@@ -29,21 +46,36 @@ export default function HomePage() {
         </section>
 
         {/* ===================== Slot da foto do grupo =====================
-            Vazio por enquanto. Quando a foto chegar, substituir o bloco
-            vazio por: <Image src="/brand/foto-grupo.webp" alt="Foto do grupo"
-            fill className="object-cover" /> dentro de um wrapper relativo
-            full-width — assim ela preenche toda a lateral do site. */}
+            Mantido vazio por enquanto. Quando a foto chegar, troque o bloco
+            interno por: <Image src="/brand/foto-grupo.webp" alt="Foto do
+            grupo" fill className="object-cover" /> dentro de um wrapper
+            relativo full-width — assim ela preenche toda a lateral do site. */}
         <section
           aria-label="Espaço reservado para a foto do grupo"
-          className="w-full bg-sand"
+          className="relative w-full overflow-hidden border-y border-dark-green/10 bg-sand"
         >
-          <div className="flex h-[42vw] max-h-[560px] min-h-[220px] w-full items-center justify-center border-y-2 border-dashed border-dark-green/15" />
+          <div className="relative flex h-[42vw] max-h-[560px] min-h-[220px] w-full items-center justify-center">
+            <Image
+              aria-hidden
+              alt=""
+              src="/brand/astrolabe.webp"
+              width={389}
+              height={367}
+              className="pointer-events-none absolute h-[68%] w-auto opacity-[0.06] brightness-0 select-none"
+            />
+            <span className="relative font-display text-[11px] uppercase tracking-[0.3em] text-dark-green/40">
+              Foto do grupo em breve
+            </span>
+          </div>
         </section>
 
         {/* ===================== Últimas postagens ===================== */}
         <section className="mx-auto w-full max-w-[1400px] px-5 py-14 sm:px-8 sm:py-16">
           <div className="mb-6 flex items-end justify-between gap-4 border-b border-dark-green/15 pb-3">
-            <h2 className="font-display text-2xl font-semibold text-dark-green sm:text-3xl">
+            <h2 className="flex items-center gap-3 font-display text-2xl font-semibold text-dark-green sm:text-3xl">
+              <span className="hidden h-9 w-9 shrink-0 place-items-center rounded-full bg-dark-green text-vanilla sm:grid">
+                <GlobeGrid className="h-5 w-5" />
+              </span>
               Confira nossas últimas postagens
             </h2>
             <Link
@@ -58,8 +90,19 @@ export default function HomePage() {
         </section>
 
         {/* ===================== Newsletter (link externo) ===================== */}
-        <section id="newsletter" className="scroll-mt-24 bg-moss/15">
-          <div className="mx-auto w-full max-w-[1400px] px-5 py-16 text-center sm:px-8">
+        <section
+          id="newsletter"
+          className="relative scroll-mt-24 overflow-hidden bg-moss/15"
+        >
+          <Image
+            aria-hidden
+            alt=""
+            src="/brand/compass-rose.webp"
+            width={608}
+            height={608}
+            className="pointer-events-none absolute -left-20 top-1/2 w-[340px] -translate-y-1/2 opacity-[0.07] brightness-0 select-none"
+          />
+          <div className="relative mx-auto w-full max-w-[1400px] px-5 py-16 text-center sm:px-8">
             <h2 className="font-display text-2xl font-semibold text-dark-green sm:text-3xl">
               Receba a nossa newsletter
             </h2>
