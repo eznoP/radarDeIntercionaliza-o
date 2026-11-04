@@ -3,7 +3,7 @@ import { Pencil, Plus, Star } from "lucide-react";
 import { AdminAlert } from "@/components/admin/admin-alert";
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { DeleteButton } from "@/components/admin/delete-button";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentProfile } from "@/lib/supabase/server";
 import { adminConfigured } from "@/lib/admin/guard";
 import type { PostStatus } from "@/lib/database.types";
 import { cn } from "@/lib/utils";
@@ -52,11 +52,19 @@ export default async function PublicacoesPage({
       : "all";
 
   const supabase = await createClient();
+  const current = await getCurrentProfile();
+  const isAdmin = Boolean(current?.profile?.is_admin);
+
   let query = supabase
     .from("posts")
     .select("*")
     .order("published_at", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false });
+
+  // Integrante aprovado vê e gerencia apenas as próprias publicações.
+  if (!isAdmin && current?.profile) {
+    query = query.eq("author_id", current.profile.id);
+  }
 
   if (filter !== "all") query = query.eq("status", filter);
 
@@ -75,7 +83,11 @@ export default async function PublicacoesPage({
     <>
       <AdminPageHeader
         title="Publicações"
-        description="Notícias e conteúdos do site. Destaques aparecem na Home."
+        description={
+          isAdmin
+            ? "Notícias e conteúdos do site. Destaques aparecem na Home."
+            : "As suas publicações. Você pode criar, editar e excluir apenas os seus conteúdos."
+        }
         action={
           <Link
             href="/admin/publicacoes/nova"
@@ -112,7 +124,9 @@ export default async function PublicacoesPage({
       {list.length === 0 ? (
         <div className="rounded-card border border-dark-green/10 bg-white px-5 py-12 text-center shadow-sm">
           <p className="font-body text-sm text-ink/60">
-            Nenhuma publicação por aqui ainda.
+            {isAdmin
+              ? "Nenhuma publicação por aqui ainda."
+              : "Você ainda não publicou nada."}
           </p>
           <Link
             href="/admin/publicacoes/nova"

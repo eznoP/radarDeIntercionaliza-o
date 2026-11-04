@@ -12,6 +12,7 @@ import {
   Menu,
   Newspaper,
   Tags,
+  UserRound,
   Users,
   X,
 } from "lucide-react";
@@ -19,22 +20,33 @@ import { signOut } from "@/app/admin/actions";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { href: "/admin", label: "Visão geral", icon: LayoutDashboard },
-  { href: "/admin/publicacoes", label: "Publicações", icon: Newspaper },
-  { href: "/admin/categorias", label: "Categorias", icon: Tags },
-  { href: "/admin/cargos", label: "Cargos", icon: Briefcase },
-  { href: "/admin/integrantes", label: "Integrantes", icon: Users },
+  { href: "/admin", label: "Visão geral", icon: LayoutDashboard, adminOnly: false },
+  { href: "/admin/publicacoes", label: "Publicações", icon: Newspaper, adminOnly: false },
+  { href: "/admin/categorias", label: "Categorias", icon: Tags, adminOnly: true },
+  { href: "/admin/cargos", label: "Cargos", icon: Briefcase, adminOnly: true },
+  { href: "/admin/integrantes", label: "Integrantes", icon: Users, adminOnly: true },
 ];
 
 export function AdminShell({
   profile,
+  isAdmin = true,
   children,
 }: {
   profile: { name: string; email: string | null };
+  isAdmin?: boolean;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  const navItems = [
+    ...NAV.filter((item) => isAdmin || !item.adminOnly),
+    ...(isAdmin
+      ? []
+      : [{ href: "/meu-perfil", label: "Meu perfil", icon: UserRound, adminOnly: false }]),
+  ];
+
+  const panelTitle = isAdmin ? "Painel do gestor" : "Área do autor";
 
   const isActive = (href: string) =>
     href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
@@ -72,7 +84,7 @@ export function AdminShell({
                 Radar de
               </span>
               <span className="block font-display text-sm font-semibold italic text-vanilla">
-                Painel do gestor
+                {panelTitle}
               </span>
             </span>
           </Link>
@@ -87,7 +99,7 @@ export function AdminShell({
         </div>
 
         <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
-          {NAV.map((item) => {
+          {navItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.href);
             return (
@@ -150,7 +162,7 @@ export function AdminShell({
             <Menu className="h-6 w-6" />
           </button>
           <span className="font-display text-sm font-semibold text-dark-green">
-            Painel do gestor
+            {panelTitle}
           </span>
         </header>
 

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/page-header";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentProfile } from "@/lib/supabase/server";
 import { adminConfigured } from "@/lib/admin/guard";
 import { PostForm } from "../post-form";
 
@@ -10,6 +10,9 @@ export const metadata = { title: "Nova publicação" };
 export default async function NovaPublicacaoPage() {
   if (!adminConfigured()) return null;
   const supabase = await createClient();
+  const current = await getCurrentProfile();
+  const isAdmin = Boolean(current?.profile?.is_admin);
+
   const [{ data: categories }, { data: authors }] = await Promise.all([
     supabase.from("categories").select("id, name").order("sort_order"),
     supabase
@@ -19,11 +22,22 @@ export default async function NovaPublicacaoPage() {
       .order("full_name"),
   ]);
 
+  // Integrante publica em nome próprio: lista só com o seu próprio nome.
+  const authorOptions = isAdmin
+    ? (authors ?? [])
+    : current?.profile
+      ? [{ id: current.profile.id, full_name: current.profile.full_name }]
+      : [];
+
   return (
     <>
       <AdminPageHeader
         title="Nova publicação"
-        description="Preencha os campos obrigatórios. Foto e vídeo são opcionais."
+        description={
+          isAdmin
+            ? "Preencha os campos obrigatórios. Foto e vídeo são opcionais."
+            : "Preencha os campos obrigatórios. A publicação entra no seu nome."
+        }
         action={
           <Link
             href="/admin/publicacoes"
@@ -35,7 +49,11 @@ export default async function NovaPublicacaoPage() {
         }
       />
       <div className="max-w-4xl">
-        <PostForm categories={categories ?? []} authors={authors ?? []} />
+        <PostForm
+          categories={categories ?? []}
+          authors={authorOptions}
+          isAdmin={isAdmin}
+        />
       </div>
     </>
   );

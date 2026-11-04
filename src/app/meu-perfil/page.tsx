@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Clock, ExternalLink, ShieldCheck } from "lucide-react";
+import { Clock, ExternalLink, LayoutDashboard, ShieldCheck } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { AdminNotice } from "@/components/admin/admin-notice";
@@ -59,6 +59,7 @@ export default async function MeuPerfilPage() {
           {!profile ? (
             <div className="mt-6">
               <AdminNotice
+                badge="Meu perfil"
                 title="Perfil não encontrado"
                 description="A sua conta existe, mas ainda não está vinculada a um perfil. Peça ao gestor para concluir o seu cadastro."
               />
@@ -70,7 +71,8 @@ export default async function MeuPerfilPage() {
                   <Clock className="mt-0.5 h-4 w-4 shrink-0" />
                   <span>
                     O seu perfil está <strong>aguardando aprovação</strong> do
-                    gestor. Assim que for aprovado, ele aparecerá no site.
+                    gestor. Assim que for aprovado, ele aparecerá no site e você
+                    ganhará acesso ao painel para publicar.
                   </span>
                 </div>
               )}
@@ -93,7 +95,16 @@ export default async function MeuPerfilPage() {
                 <PasswordForm />
               </div>
 
-              <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 font-body text-sm text-ink/55">
+              <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 font-body text-sm text-ink/55">
+                {profile.status === "approved" && (
+                  <Link
+                    href="/admin"
+                    className="inline-flex items-center gap-2 rounded-xl bg-dark-green px-4 py-2 font-display text-sm font-semibold text-white shadow-sm transition duration-200 hover:bg-moss hover:shadow-lg active:scale-[0.98]"
+                  >
+                    <LayoutDashboard className="h-4 w-4" />
+                    Ir para o painel
+                  </Link>
+                )}
                 <Link
                   href="/integrantes"
                   className="inline-flex items-center gap-1.5 text-glaucous hover:text-dark-green"
@@ -103,7 +114,9 @@ export default async function MeuPerfilPage() {
                 </Link>
                 <span className="inline-flex items-center gap-1.5">
                   <ShieldCheck className="h-4 w-4 text-moss" />
-                  O seu acesso não dá permissão de gestor.
+                  {profile.status === "approved"
+                    ? "Você publica apenas os seus próprios conteúdos."
+                    : "O seu acesso ainda não foi aprovado pelo gestor."}
                 </span>
               </div>
             </>

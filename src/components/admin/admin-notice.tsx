@@ -7,17 +7,19 @@ export function AdminNotice({
   title,
   description,
   action,
+  badge = "Painel do gestor",
 }: {
   title: string;
   description: string;
   action?: React.ReactNode;
+  badge?: string;
 }) {
   return (
     <>
       <SiteHeader />
       <main className="mx-auto flex min-h-[60vh] max-w-2xl flex-col items-center justify-center px-5 py-24 text-center sm:px-8">
         <span className="rounded-full bg-vanilla px-3 py-1 font-display text-xs font-semibold uppercase tracking-wider text-dark-green">
-          Painel do gestor
+          {badge}
         </span>
         <h1 className="mt-6 font-display text-3xl font-bold text-dark-green sm:text-4xl">
           {title}

@@ -16,10 +16,11 @@ import {
 } from "@/lib/supabase/server";
 import { isAdminConfigured } from "@/lib/supabase/admin";
 import { adminConfigured } from "@/lib/admin/guard";
+import type { PostStatus } from "@/lib/database.types";
 
 export const metadata = { title: "Visão geral" };
 
-async function count(table: "posts" | "categories" | "roles" | "profiles") {
+async function count(table: "categories" | "roles" | "profiles") {
   const supabase = await createClient();
   const { count: total } = await supabase
     .from(table)
@@ -27,90 +28,113 @@ async function count(table: "posts" | "categories" | "roles" | "profiles") {
   return total ?? 0;
 }
 
+async function countPosts(
+  opts: { status?: PostStatus; authorId?: string; featured?: boolean } = {},
+) {
+  const supabase = await createClient();
+  let query = supabase.from("posts").select("*", { count: "exact", head: true });
+  if (opts.status) query = query.eq("status", opts.status);
+  if (opts.authorId) query = query.eq("author_id", opts.authorId);
+  if (opts.featured) query = query.eq("is_featured", true);
+  const { count: total } = await query;
+  return total ?? 0;
+}
+
 export default async function AdminHome() {
   if (!adminConfigured()) return null;
   const current = await getCurrentProfile();
+  const profile = current?.profile;
+  const isAdmin = Boolean(profile?.is_admin);
+  const myId = profile?.id;
+  const authorFilter = isAdmin ? undefined : myId;
 
-  const [posts, published, drafts, categories, roles, integrantes] =
-    await Promise.all([
-      count("posts"),
-      (async () => {
-        const supabase = await createClient();
-        const { count: total } = await supabase
-          .from("posts")
-          .select("*", { count: "exact", head: true })
-          .eq("status", "published");
-        return total ?? 0;
-      })(),
-      (async () => {
-        const supabase = await createClient();
-        const { count: total } = await supabase
-          .from("posts")
-          .select("*", { count: "exact", head: true })
-          .eq("status", "draft");
-        return total ?? 0;
-      })(),
-      count("categories"),
-      count("roles"),
-      count("profiles"),
-    ]);
+  const [posts, published, drafts, categories] = await Promise.all([
+    countPosts({ authorId: authorFilter }),
+    countPosts({ status: "published", authorId: authorFilter }),
+    countPosts({ status: "draft", authorId: authorFilter }),
+    count("categories"),
+  ]);
 
-  const featured = await (async () => {
-    const supabase = await createClient();
-    const { count: total } = await supabase
-      .from("posts")
-      .select("*", { count: "exact", head: true })
-      .eq("is_featured", true)
-      .eq("status", "published");
-    return total ?? 0;
-  })();
+  const [roles, integrantes, featured, pendingProfiles] = isAdmin
+    ? await Promise.all([
+        count("roles"),
+        count("profiles"),
+        countPosts({ status: "published", featured: true }),
+        (async () => {
+          const supabase = await createClient();
+          const { count: total } = await supabase
+            .from("profiles")
+            .select("*", { count: "exact", head: true })
+            .eq("status", "pending");
+          return total ?? 0;
+        })(),
+      ])
+    : [0, 0, 0, 0];
 
-  const pendingProfiles = await (async () => {
-    const supabase = await createClient();
-    const { count: total } = await supabase
-      .from("profiles")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "pending");
-    return total ?? 0;
-  })();
+  const firstName =
+    profile?.full_name?.split(" ")[0] ?? (isAdmin ? "gestor" : "integrante");
 
-  const stats = [
-    {
-      label: "Publicações",
-      value: posts,
-      hint: `${published} publicadas · ${drafts} rascunhos`,
-      href: "/admin/publicacoes",
-      icon: Newspaper,
-    },
-    {
-      label: "Destaques na Home",
-      value: featured,
-      hint: "Marcadas com destaque",
-      href: "/admin/publicacoes",
-      icon: Star,
-    },
-    {
-      label: "Categorias",
-      value: categories,
-      hint: "Área separada",
-      href: "/admin/categorias",
-      icon: Tags,
-    },
-    {
-      label: "Cargos",
-      value: roles,
-      hint: "Área separada",
-      href: "/admin/cargos",
-      icon: Briefcase,
-    },
-    {
-      label: "Integrantes",
-      value: integrantes,
-      hint: "Autores e equipe",
-      href: "/admin/integrantes",
-      icon: Users,
-    },
-  ];
+  const stats = isAdmin
+    ? [
+        {
+          label: "Publicações",
+          value: posts,
+          hint: `${published} publicadas · ${drafts} rascunhos`,
+          href: "/admin/publicacoes",
+          icon: Newspaper,
+        },
+        {
+          label: "Destaques na Home",
+          value: featured,
+          hint: "Marcadas com destaque",
+          href: "/admin/publicacoes",
+          icon: Star,
+        },
+        {
+          label: "Categorias",
+          value: categories,
+          hint: "Área separada",
+          href: "/admin/categorias",
+          icon: Tags,
+        },
+        {
+          label: "Cargos",
+          value: roles,
+          hint: "Área separada",
+          href: "/admin/cargos",
+          icon: Briefcase,
+        },
+        {
+          label: "Integrantes",
+          value: integrantes,
+          hint: "Autores e equipe",
+          href: "/admin/integrantes",
+          icon: Users,
+        },
+      ]
+    : [
+        {
+          label: "Minhas publicações",
+          value: posts,
+          hint: `${published} publicadas · ${drafts} rascunhos`,
+          href: "/admin/publicacoes",
+          icon: Newspaper,
+        },
+        {
+          label: "Publicadas",
+          value: published,
+          hint: "Visíveis no site",
+          href: "/admin/publicacoes?status=published",
+          icon: Star,
+        },
+        {
+          label: "Rascunhos",
+          value: drafts,
+          hint: "Ainda não publicadas",
+          href: "/admin/publicacoes?status=draft",
+          icon: Newspaper,
+        },
+      ];
 
   const warnings: { text: string; href?: string }[] = [];
   if (!isSupabaseConfigured()) {
@@ -118,12 +142,12 @@ export default async function AdminHome() {
       text: "O Supabase ainda não está configurado. Preencha o .env.local com a URL e as chaves e reinicie o servidor.",
     });
   }
-  if (!isAdminConfigured()) {
+  if (isAdmin && !isAdminConfigured()) {
     warnings.push({
       text: "A chave secreta (SUPABASE_SERVICE_ROLE_KEY) não está configurada. Sem ela não é possível criar ou gerenciar os acessos dos integrantes.",
     });
   }
-  if (pendingProfiles > 0) {
+  if (isAdmin && pendingProfiles > 0) {
     warnings.push({
       text:
         pendingProfiles === 1
@@ -134,22 +158,26 @@ export default async function AdminHome() {
   }
   if (categories === 0) {
     warnings.push({
-      text: "Nenhuma categoria cadastrada. Crie ao menos uma para poder publicar.",
+      text: isAdmin
+        ? "Nenhuma categoria cadastrada. Crie ao menos uma para poder publicar."
+        : "Ainda não há categorias cadastradas. Peça ao gestor para criar uma antes de publicar.",
     });
   }
-  if (integrantes === 0) {
+  if (isAdmin && integrantes === 0) {
     warnings.push({
       text: "Nenhum integrante cadastrado. Cadastre um autor(a) para vincular às publicações.",
     });
   }
 
-  const firstName = current?.profile?.full_name?.split(" ")[0] ?? "gestor";
-
   return (
     <>
       <AdminPageHeader
         title={`Olá, ${firstName}`}
-        description="Resumo do conteúdo do Radar de Internacionalização."
+        description={
+          isAdmin
+            ? "Resumo do conteúdo do Radar de Internacionalização."
+            : "Os seus conteúdos no Radar de Internacionalização."
+        }
         action={
           <Link
             href="/admin/publicacoes/nova"
@@ -223,21 +251,43 @@ export default async function AdminHome() {
             title="Criar publicação"
             description="Título, resumo, conteúdo e mídia."
           />
-          <QuickLink
-            href="/admin/integrantes/novo"
-            title="Cadastrar integrante"
-            description="Pessoas do projeto e acesso ao painel."
-          />
-          <QuickLink
-            href="/admin/categorias"
-            title="Gerenciar categorias"
-            description="Área exclusiva das categorias."
-          />
-          <QuickLink
-            href="/admin/cargos"
-            title="Gerenciar cargos"
-            description="Área exclusiva dos cargos."
-          />
+          {isAdmin ? (
+            <>
+              <QuickLink
+                href="/admin/integrantes/novo"
+                title="Cadastrar integrante"
+                description="Pessoas do projeto e acesso ao painel."
+              />
+              <QuickLink
+                href="/admin/categorias"
+                title="Gerenciar categorias"
+                description="Área exclusiva das categorias."
+              />
+              <QuickLink
+                href="/admin/cargos"
+                title="Gerenciar cargos"
+                description="Área exclusiva dos cargos."
+              />
+            </>
+          ) : (
+            <>
+              <QuickLink
+                href="/admin/publicacoes"
+                title="Minhas publicações"
+                description="Edite ou remova os seus conteúdos."
+              />
+              <QuickLink
+                href="/meu-perfil"
+                title="Meu perfil"
+                description="Foto, cargo, descrição e contatos."
+              />
+              <QuickLink
+                href="/integrantes"
+                title="Ver a equipe"
+                description="Página pública de integrantes."
+              />
+            </>
+          )}
         </div>
       </section>
     </>

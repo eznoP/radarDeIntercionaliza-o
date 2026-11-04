@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/page-header";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentProfile } from "@/lib/supabase/server";
 import { adminConfigured } from "@/lib/admin/guard";
 import { PostForm } from "../../post-form";
 
@@ -16,6 +16,8 @@ export default async function EditarPublicacaoPage({
   if (!adminConfigured()) return null;
   const { id } = await params;
   const supabase = await createClient();
+  const current = await getCurrentProfile();
+  const isAdmin = Boolean(current?.profile?.is_admin);
 
   const [{ data: post }, { data: categories }, { data: authors }] =
     await Promise.all([
@@ -29,6 +31,20 @@ export default async function EditarPublicacaoPage({
     ]);
 
   if (!post) notFound();
+
+  // Integrante só edita as próprias publicações.
+  if (!isAdmin && post.author_id !== current?.profile?.id) {
+    redirect(
+      "/admin/publicacoes?erro=" +
+        encodeURIComponent("Você só pode editar as publicações criadas por você."),
+    );
+  }
+
+  const authorOptions = isAdmin
+    ? (authors ?? [])
+    : current?.profile
+      ? [{ id: current.profile.id, full_name: current.profile.full_name }]
+      : [];
 
   return (
     <>
@@ -49,7 +65,8 @@ export default async function EditarPublicacaoPage({
         <PostForm
           post={post}
           categories={categories ?? []}
-          authors={authors ?? []}
+          authors={authorOptions}
+          isAdmin={isAdmin}
         />
       </div>
     </>

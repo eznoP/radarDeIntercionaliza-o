@@ -193,12 +193,12 @@ export function IntegranteForm({
         <Field
           label="Situação do perfil"
           htmlFor="status"
-          hint="Só perfis “Aprovado” aparecem na página pública de Integrantes."
+          hint="Só perfis “Aprovado” aparecem na página pública de Integrantes e têm acesso ao painel para publicar."
         >
           <select
             id="status"
             name="status"
-            defaultValue={isSelf ? "approved" : (integrante?.status ?? "pending")}
+            defaultValue={isSelf ? "approved" : (integrante?.status ?? "approved")}
             disabled={isSelf}
             className={fieldInputClass(false)}
           >

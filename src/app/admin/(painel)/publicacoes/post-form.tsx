@@ -30,20 +30,29 @@ export function PostForm({
   post,
   categories,
   authors,
+  isAdmin = true,
 }: {
   post?: Post;
   categories: Pick<Tables<"categories">, "id" | "name">[];
   authors: Pick<Tables<"profiles">, "id" | "full_name">[];
+  isAdmin?: boolean;
 }) {
   const action = post ? updatePost.bind(null, post.id) : createPost;
   const [state, formAction] = useActionState(action, initialFormState);
+
+  const lockAuthor = !isAdmin;
+  const canFeature = isAdmin;
 
   const [slug, setSlug] = useState(post?.slug ?? "");
   const [slugEdited, setSlugEdited] = useState(Boolean(post));
   const [featured, setFeatured] = useState(Boolean(post?.is_featured));
 
   const missingCategories = categories.length === 0;
-  const missingAuthors = authors.length === 0;
+  const missingAuthors = !lockAuthor && authors.length === 0;
+
+  const lockedAuthorId = post?.author_id ?? authors[0]?.id ?? "";
+  const lockedAuthorName =
+    authors.find((a) => a.id === lockedAuthorId)?.full_name ?? "—";
 
   return (
     <form action={formAction} className="space-y-6">
@@ -54,17 +63,20 @@ export function PostForm({
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
           <div>
             Para publicar, você precisa de pelo menos{" "}
-            {missingCategories && (
-              <>
-                uma{" "}
-                <Link
-                  href="/admin/categorias"
-                  className="font-semibold underline"
-                >
-                  categoria
-                </Link>
-              </>
-            )}
+            {missingCategories &&
+              (isAdmin ? (
+                <>
+                  uma{" "}
+                  <Link
+                    href="/admin/categorias"
+                    className="font-semibold underline"
+                  >
+                    categoria
+                  </Link>
+                </>
+              ) : (
+                "uma categoria (peça ao gestor para cadastrar)"
+              ))}
             {missingCategories && missingAuthors && " e "}
             {missingAuthors && (
               <>
@@ -190,19 +202,31 @@ export function PostForm({
             required
             error={state.fieldErrors?.author_id}
           >
-            <select
-              id="author_id"
-              name="author_id"
-              defaultValue={post?.author_id ?? ""}
-              className={fieldInputClass(Boolean(state.fieldErrors?.author_id))}
-            >
-              <option value="">Selecione o(a) autor(a)</option>
-              {authors.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.full_name}
-                </option>
-              ))}
-            </select>
+            {lockAuthor ? (
+              <div className="flex flex-col gap-2">
+                <input type="hidden" name="author_id" value={lockedAuthorId} />
+                <span className="rounded-lg border border-dark-green/15 bg-cream/60 px-3 py-2 font-body text-sm text-ink/80">
+                  {lockedAuthorName}
+                </span>
+                <span className="font-body text-xs text-ink/50">
+                  A publicação entra no seu nome.
+                </span>
+              </div>
+            ) : (
+              <select
+                id="author_id"
+                name="author_id"
+                defaultValue={post?.author_id ?? ""}
+                className={fieldInputClass(Boolean(state.fieldErrors?.author_id))}
+              >
+                <option value="">Selecione o(a) autor(a)</option>
+                {authors.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.full_name}
+                  </option>
+                ))}
+              </select>
+            )}
           </Field>
         </div>
 
@@ -235,24 +259,26 @@ export function PostForm({
           </Field>
         </div>
 
-        <label className="flex items-start gap-3 rounded-xl border border-dark-green/10 bg-cream/60 p-4">
-          <input
-            type="checkbox"
-            name="is_featured"
-            checked={featured}
-            onChange={(e) => setFeatured(e.target.checked)}
-            className="mt-0.5 h-4 w-4 accent-moss"
-          />
-          <span className="font-body text-sm text-ink/80">
-            <span className="flex items-center gap-1.5 font-display font-medium text-dark-green">
-              <Star className="h-4 w-4 text-vanilla" />
-              Destaque na Home
+        {canFeature && (
+          <label className="flex items-start gap-3 rounded-xl border border-dark-green/10 bg-cream/60 p-4">
+            <input
+              type="checkbox"
+              name="is_featured"
+              checked={featured}
+              onChange={(e) => setFeatured(e.target.checked)}
+              className="mt-0.5 h-4 w-4 accent-moss"
+            />
+            <span className="font-body text-sm text-ink/80">
+              <span className="flex items-center gap-1.5 font-display font-medium text-dark-green">
+                <Star className="h-4 w-4 text-vanilla" />
+                Destaque na Home
+              </span>
+              <br />
+              A publicação marcada como destaque aparece em evidência na página
+              inicial.
             </span>
-            <br />
-            A publicação marcada como destaque aparece em evidência na página
-            inicial.
-          </span>
-        </label>
+          </label>
+        )}
       </section>
 
       {/* ---------- Mídia ---------- */}

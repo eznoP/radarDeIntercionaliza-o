@@ -20,16 +20,22 @@ export default async function PainelLayout({
   const current = await getCurrentProfile();
   if (!current) redirect("/admin/login");
 
-  // Integrantes comuns personalizam o próprio perfil em /meu-perfil.
-  if (!current.profile?.is_admin) {
+  const profile = current.profile;
+  if (!profile) redirect("/meu-perfil");
+
+  // Gestor master e integrantes aprovados usam o painel.
+  // Pendentes/inativos continuam apenas na área do próprio perfil.
+  const isAdmin = profile.is_admin;
+  if (!isAdmin && profile.status !== "approved") {
     redirect("/meu-perfil");
   }
 
   return (
     <AdminShell
+      isAdmin={isAdmin}
       profile={{
-        name: current.profile.full_name,
-        email: current.profile.email,
+        name: profile.full_name,
+        email: profile.email ?? (profile.access ? `acesso: ${profile.access}` : null),
       }}
     >
       {children}

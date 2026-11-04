@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireAdmin } from "@/lib/admin/auth";
+import { requirePanelMember } from "@/lib/admin/auth";
 import { dbErrorMessage } from "@/lib/admin/errors";
 import { errorState, type FormState } from "@/lib/admin/types";
 import { checkbox, optionalText, requiredText } from "@/lib/admin/validation";
@@ -113,7 +113,11 @@ export async function createPost(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
-  await requireAdmin();
+  const me = await requirePanelMember();
+  const profile = me.profile;
+  if (!profile) return errorState("Perfil não encontrado.");
+  const isAdmin = profile.is_admin;
+
   const f = readForm(formData);
   if (Object.keys(f.errors).length) {
     return errorState("Preencha os campos destacados.", f.errors);
@@ -133,8 +137,9 @@ export async function createPost(
     cover_image_url: f.cover_image_url || null,
     video_url: f.video_url || null,
     category_id: f.category_id,
-    author_id: f.author_id,
-    is_featured: f.is_featured,
+    // Integrante comum só publica em nome próprio; destaque é do gestor.
+    author_id: isAdmin ? f.author_id : profile.id,
+    is_featured: isAdmin ? f.is_featured : false,
     status: f.status,
     published_at: resolvePublishedAt(f.publishedAtRaw, f.status),
   });
@@ -151,7 +156,22 @@ export async function updatePost(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
-  await requireAdmin();
+  const me = await requirePanelMember();
+  const profile = me.profile;
+  if (!profile) return errorState("Perfil não encontrado.");
+  const isAdmin = profile.is_admin;
+
+  const supabase = await createClient();
+  const { data: current } = await supabase
+    .from("posts")
+    .select("author_id, is_featured")
+    .eq("id", id)
+    .maybeSingle();
+  if (!current) return errorState("Publicação não encontrada.");
+  if (!isAdmin && current.author_id !== profile.id) {
+    return errorState("Você só pode editar as publicações criadas por você.");
+  }
+
   const f = readForm(formData);
   if (Object.keys(f.errors).length) {
     return errorState("Preencha os campos destacados.", f.errors);
@@ -162,7 +182,6 @@ export async function updatePost(
     });
   }
 
-  const supabase = await createClient();
   const { error } = await supabase
     .from("posts")
     .update({
@@ -173,8 +192,9 @@ export async function updatePost(
       cover_image_url: f.cover_image_url || null,
       video_url: f.video_url || null,
       category_id: f.category_id,
-      author_id: f.author_id,
-      is_featured: f.is_featured,
+      // Integrante comum mantém a própria autoria e o destaque do gestor.
+      author_id: isAdmin ? f.author_id : profile.id,
+      is_featured: isAdmin ? f.is_featured : current.is_featured,
       status: f.status,
       published_at: resolvePublishedAt(f.publishedAtRaw, f.status),
     })
@@ -188,8 +208,23 @@ export async function updatePost(
 }
 
 export async function deletePost(id: string): Promise<void> {
-  await requireAdmin();
+  const me = await requirePanelMember();
+  const profile = me.profile;
   const supabase = await createClient();
+
+  if (!profile?.is_admin) {
+    const { data: current } = await supabase
+      .from("posts")
+      .select("author_id")
+      .eq("id", id)
+      .maybeSingle();
+    if (!current || current.author_id !== profile?.id) {
+      redirect(
+        `${LIST_PATH}?erro=${encodeURIComponent("Você só pode excluir as publicações criadas por você.")}`,
+      );
+    }
+  }
+
   const { error } = await supabase.from("posts").delete().eq("id", id);
 
   revalidateAll();

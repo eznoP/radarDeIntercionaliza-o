@@ -221,6 +221,14 @@ export type Database = {
         Args: Record<string, never>;
         Returns: boolean;
       };
+      can_publish: {
+        Args: Record<string, never>;
+        Returns: boolean;
+      };
+      current_profile_id: {
+        Args: Record<string, never>;
+        Returns: string;
+      };
     };
     Enums: {
       post_status: PostStatus;

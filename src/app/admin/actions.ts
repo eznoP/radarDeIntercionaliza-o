@@ -59,12 +59,19 @@ export async function signIn(
   }
 
   const requested = String(formData.get("redirectTo") ?? "");
-
-  // Gestor master -> painel. Integrante comum -> área do próprio perfil.
-  if (profile?.is_admin) {
-    redirect(requested.startsWith("/admin") && requested !== "/admin/login"
+  const safeRequested =
+    requested.startsWith("/admin") && requested !== "/admin/login"
       ? requested
-      : "/admin");
+      : null;
+
+  // Gestor master -> painel. Integrante aprovado -> painel (escopo próprio).
+  // Pendentes/inativos -> área do próprio perfil.
+  if (profile?.is_admin) {
+    redirect(safeRequested ?? "/admin");
+  }
+
+  if (profile?.status === "approved") {
+    redirect(safeRequested ?? "/admin");
   }
 
   redirect("/meu-perfil");
