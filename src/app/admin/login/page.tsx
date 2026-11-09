@@ -67,15 +67,19 @@ export default async function LoginPage({
           </div>
         )}
 
-        <p className="mt-6 text-center font-body text-xs text-ink/50">
-          <Link href="/" className="underline-offset-2 hover:underline">
-            Voltar para o site
+        <div className="mt-6 space-y-3 text-center">
+          <Link
+            href="/cadastro"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-vanilla px-6 py-3 font-display text-sm font-semibold text-dark-green shadow-sm ring-1 ring-dark-green/10 transition duration-200 hover:bg-moss hover:text-white hover:shadow-lg active:scale-[0.98]"
+          >
+            É integrante e não possui conta?
           </Link>
-          {" · "}
-          <Link href="/cadastro" className="underline-offset-2 hover:underline">
-            Não tem acesso? Solicite o cadastro
-          </Link>
-        </p>
+          <p className="font-body text-xs text-ink/50">
+            <Link href="/" className="underline-offset-2 hover:underline">
+              Voltar para o site
+            </Link>
+          </p>
+        </div>
       </div>
     </main>
   );

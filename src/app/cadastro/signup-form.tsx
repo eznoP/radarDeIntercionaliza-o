@@ -8,11 +8,9 @@ import { cn } from "@/lib/utils";
 
 function inputClass(hasError: boolean) {
   return [
-    "w-full rounded-xl border bg-white px-4 py-3 font-body text-sm text-ink outline-none transition",
-    "placeholder:text-ink/35 focus:ring-2 focus:ring-moss/40",
-    hasError
-      ? "border-red-400 focus:border-red-400"
-      : "border-dark-green/15 focus:border-moss",
+    "w-full rounded-xl border border-dark-green/15 bg-cream px-4 py-3 font-body text-sm text-ink outline-none transition",
+    "placeholder:text-ink/35 focus:ring-2 focus:ring-moss/40 focus:border-moss",
+    hasError ? "border-red-400 focus:border-red-400" : "",
   ].join(" ");
 }
 
