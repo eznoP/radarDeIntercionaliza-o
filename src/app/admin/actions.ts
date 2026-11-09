@@ -7,7 +7,10 @@ import { errorState, type FormState } from "@/lib/admin/types";
 
 const AUTH_MESSAGES: Record<string, string> = {
   "Invalid login credentials": "Acesso ou senha incorretos.",
-  "Email not confirmed": "Confirme o seu acesso antes de entrar.",
+  // Um cadastro auto-registrado nasce sem o e-mail interno confirmado:
+  // ele só passa a autenticar (e assim obter acesso) depois da aprovação.
+  "Email not confirmed":
+    "O seu acesso ainda não foi liberado pelo gestor. Assim que a aprovação sair, tente entrar novamente.",
   "Too many requests": "Muitas tentativas. Aguarde alguns instantes.",
 };
 

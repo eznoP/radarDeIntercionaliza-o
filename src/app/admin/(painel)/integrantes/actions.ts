@@ -318,6 +318,22 @@ export async function updateIntegrante(
     .eq("id", id);
   if (error) return errorState(dbErrorMessage(error));
 
+  // Aprovação pelo formulário: confirma o e-mail interno para liberar o login
+  // de cadastros auto-registrados que ainda não conseguem autenticar.
+  if (status === "approved" && userId) {
+    const authError = await confirmAuthEmail(
+      userId,
+      f.access || normalizeAccess(current.access ?? ""),
+    );
+    if (authError) {
+      redirect(
+        `${LIST_PATH}?erro=${encodeURIComponent(
+          `Integrante atualizado, mas houve um problema para liberar o login: ${authError}.`,
+        )}`,
+      );
+    }
+  }
+
   revalidatePath(LIST_PATH);
   revalidatePath("/admin");
   revalidatePath("/integrantes");
@@ -326,10 +342,40 @@ export async function updateIntegrante(
   );
 }
 
+/**
+ * Confirma o e-mail interno de um cadastro auto-registrado.
+ * Sem isso o Supabase Auth recusa a autenticação ("e-mail não confirmado")
+ * mesmo com o perfil já aprovado — o login só libera depois desta etapa.
+ * Retorna null em caso de sucesso ou a descrição do problema.
+ */
+async function confirmAuthEmail(
+  userId: string,
+  access: string | null,
+): Promise<string | null> {
+  if (!userId) return null;
+  if (!isAdminConfigured()) {
+    return "o login exige a SUPABASE_SERVICE_ROLE_KEY configurada";
+  }
+  const admin = createAdminClient();
+  const { error } = await admin.auth.admin.updateUserById(userId, {
+    ...(access ? { email: accessToEmail(access) } : {}),
+    email_confirm: true,
+  });
+  return error
+    ? `não foi possível liberar o login: ${error.message}`
+    : null;
+}
+
 /** Aprova um perfil pendente com um clique. */
 export async function approveIntegrante(id: string): Promise<void> {
   await requireAdmin();
   const supabase = await createClient();
+  const { data: target } = await supabase
+    .from("profiles")
+    .select("access, user_id, status")
+    .eq("id", id)
+    .maybeSingle();
+
   const { error } = await supabase
     .from("profiles")
     .update({ status: "approved", is_active: true })
@@ -342,6 +388,19 @@ export async function approveIntegrante(id: string): Promise<void> {
   if (error) {
     redirect(`${LIST_PATH}?erro=${encodeURIComponent(dbErrorMessage(error))}`);
   }
+
+  // Cadastro auto-registrado: aprovar também significa liberar o login.
+  if (target?.user_id && target.status === "pending") {
+    const authError = await confirmAuthEmail(target.user_id, target.access);
+    if (authError) {
+      redirect(
+        `${LIST_PATH}?erro=${encodeURIComponent(
+          `Perfil aprovado, mas houve um problema para liberar o login: ${authError}.`,
+        )}`,
+      );
+    }
+  }
+
   redirect(
     `${LIST_PATH}?ok=${encodeURIComponent("Perfil aprovado e publicado no site.")}`,
   );

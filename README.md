@@ -29,6 +29,23 @@ Fontes:
 
 Ambas são self-hospedadas em `src/fonts/` (subsetadas para latin/latin-ext, SIL OFL).
 
+## Acesso de integrantes
+
+O fluxo de acesso é: **cadastro próprio → aprovação do gestor → login**.
+
+1. O integrante se cadastra sozinho em `/cadastro` (nome, acesso e senha),
+   linkado também na tela "Entrar" do painel.
+2. A conta nasce **pendente**: sem sessão, sem aparecer no site e sem
+   acesso a nada.
+3. O gestor revisa e aprova em `/admin/integrantes` (botão "Aprovar" — que
+   também libera o login no Supabase Auth).
+4. Aprovado, o integrante entra em `/admin/login` e publica com escopo
+   restrito; pendentes têm apenas a área `/meu-perfil`.
+
+Aprovar também confirma o e-mail interno da conta (a chave
+`SUPABASE_SERVICE_ROLE_KEY` precisa estar configurada), caso contrário o
+Supabase Auth recusa a autenticação mesmo com o perfil aprovado.
+
 ## Estrutura
 
 ```

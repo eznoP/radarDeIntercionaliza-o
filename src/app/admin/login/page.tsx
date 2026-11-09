@@ -71,6 +71,10 @@ export default async function LoginPage({
           <Link href="/" className="underline-offset-2 hover:underline">
             Voltar para o site
           </Link>
+          {" · "}
+          <Link href="/cadastro" className="underline-offset-2 hover:underline">
+            Não tem acesso? Solicite o cadastro
+          </Link>
         </p>
       </div>
     </main>
