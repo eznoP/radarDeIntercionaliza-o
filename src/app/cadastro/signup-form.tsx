@@ -79,17 +79,13 @@ export function SignupForm() {
         <AccessInput
           id="access"
           name="access"
-          placeholder="joao.silva"
+          placeholder="enzorios138"
           invalid={Boolean(state.fieldErrors?.access)}
           className={inputClass(Boolean(state.fieldErrors?.access))}
         />
         <FieldError message={state.fieldErrors?.access} />
         <p className="font-body text-xs text-ink/50">
-          Ex.:{" "}
-          <span aria-hidden className="text-ink/70">
-            joao.silva
-          </span>
-          <span className="text-ink/40">@integrantes.radar</span>
+          Ex.: <span className="text-ink/70">enzorios138</span>
         </p>
       </div>
 

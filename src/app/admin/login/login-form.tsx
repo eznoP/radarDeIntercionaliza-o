@@ -24,7 +24,6 @@ export function LoginForm({ redirectTo }: { redirectTo?: string }) {
         <AccessInput
           id="access"
           name="access"
-          placeholder="joao.silva"
           invalid={Boolean(state.fieldErrors?.access)}
           className={cn(
             "w-full rounded-xl border bg-white px-4 py-3 font-body text-sm text-ink outline-none transition",
