@@ -8,7 +8,6 @@ import {
   ACCESS_HINT,
 } from "@/lib/access";
 import {
-  createClient,
   getCurrentProfile,
   isSupabaseConfigured,
 } from "@/lib/supabase/server";
@@ -71,7 +70,6 @@ export async function signUpIntegrante(
     return errorState("Preencha os campos destacados.", errors);
   }
 
-  const supabase = await createClient();
   const admin = createAdminClient();
   const email = accessToEmail(access);
 
@@ -86,32 +84,54 @@ export async function signUpIntegrante(
     });
   }
 
-  const { data, error } = await supabase.auth.signUp({
+  // Cria a conta direto pela chave de serviço, sem e-mail de confirmação:
+  // o SMTP nativo do Supabase limita os envios a poucos por hora — e o
+  // e-mail interno nunca é entregue de qualquer forma; quem libera o
+  // acesso é a aprovação do gestor.
+  const { data: created, error } = await admin.auth.admin.createUser({
     email,
     password,
-    options: { data: { full_name, access } },
+    email_confirm: false,
+    user_metadata: { full_name, access },
   });
 
-  if (error || !data.user) {
-    const message = error?.message ?? "";
-    if (message.toLowerCase().includes("already")) {
+  let user = created?.user;
+
+  if (error && error.message.toLowerCase().includes("already")) {
+    // A conta pode ter ficado órfã de uma tentativa anterior (erro no
+    // insert do perfil): se ela existe sem perfil, reaproveita-a.
+    const { data: orphan } = await admin
+      .from("profiles")
+      .select("access")
+      .eq("access", access)
+      .maybeSingle();
+    if (orphan) {
       return errorState("Este acesso já está em uso. Escolha outro.", {
         access: "Este acesso já está em uso. Escolha outro.",
       });
     }
-    if (message.toLowerCase().includes("captcha")) {
-      return errorState(
-        "Não foi possível concluir o cadastro agora. Tente novamente em instantes.",
-      );
+    let page = 1;
+    while (!user) {
+      const { data: listed } = await admin.auth.admin.listUsers({
+        page: page++,
+        perPage: 200,
+      });
+      if (!listed || listed.users.length === 0) break;
+      user =
+        listed.users.find((u) => u.email?.toLowerCase() === email) ?? null;
+      if (page > 50) break;
     }
+    if (!user) {
+      return errorState("Este acesso já está em uso. Escolha outro.", {
+        access: "Este acesso já está em uso. Escolha outro.",
+      });
+    }
+  } else if (error || !user) {
+    console.error("[signup] createUser falhou:", error?.message ?? "sem usuário");
     return errorState(
       "Não foi possível criar o cadastro. Tente novamente em instantes.",
     );
   }
-
-  // Dependendo da configuração do projeto, o signUp pode devolver uma sessão
-  // ativa. Encerra na hora: nada de entrar sem aprovação.
-  await supabase.auth.signOut();
 
   // Slug único consultando TODOS os perfis (service role ignora a RLS).
   const root = slugify(full_name) || "integrante";
@@ -128,7 +148,7 @@ export async function signUpIntegrante(
     access,
     email: null,
     slug,
-    user_id: data.user.id,
+    user_id: user.id,
     role_id: null,
     bio: null,
     avatar_url: null,
@@ -141,9 +161,10 @@ export async function signUpIntegrante(
   });
 
   if (profileError) {
+    console.error("[signup] insert profiles falhou:", profileError.message);
     // Sem perfil, o cadastro fica órfão: remove a conta recém-criada.
     try {
-      await admin.auth.admin.deleteUser(data.user.id);
+      await admin.auth.admin.deleteUser(user.id);
     } catch {
       // best-effort
     }
