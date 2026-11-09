@@ -28,7 +28,6 @@ export default async function EditarCargoPage({
     <>
       <AdminPageHeader
         title="Editar cargo"
-        description={`Atualize os dados de "${role.name}".`}
         action={
           <Link
             href="/admin/cargos"

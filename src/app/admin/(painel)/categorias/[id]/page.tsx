@@ -28,7 +28,6 @@ export default async function EditarCategoriaPage({
     <>
       <AdminPageHeader
         title="Editar categoria"
-        description={`Atualize os dados de "${category.name}".`}
         action={
           <Link
             href="/admin/categorias"

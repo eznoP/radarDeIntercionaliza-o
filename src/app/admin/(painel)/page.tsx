@@ -74,7 +74,7 @@ export default async function AdminHome() {
   const firstName =
     profile?.full_name?.split(" ")[0] ?? (isAdmin ? "gestor" : "integrante");
 
-  const stats = isAdmin
+  const stats: { label: string; value: number; hint?: string; href: string; icon: typeof Newspaper }[] = isAdmin
     ? [
         {
           label: "Publicações",
@@ -86,28 +86,24 @@ export default async function AdminHome() {
         {
           label: "Destaques na Home",
           value: featured,
-          hint: "Marcadas com destaque",
           href: "/admin/publicacoes",
           icon: Star,
         },
         {
           label: "Categorias",
           value: categories,
-          hint: "Área separada",
           href: "/admin/categorias",
           icon: Tags,
         },
         {
           label: "Cargos",
           value: roles,
-          hint: "Área separada",
           href: "/admin/cargos",
           icon: Briefcase,
         },
         {
           label: "Integrantes",
           value: integrantes,
-          hint: "Autores e equipe",
           href: "/admin/integrantes",
           icon: Users,
         },
@@ -123,14 +119,12 @@ export default async function AdminHome() {
         {
           label: "Publicadas",
           value: published,
-          hint: "Visíveis no site",
           href: "/admin/publicacoes?status=published",
           icon: Star,
         },
         {
           label: "Rascunhos",
           value: drafts,
-          hint: "Ainda não publicadas",
           href: "/admin/publicacoes?status=draft",
           icon: Newspaper,
         },
@@ -165,11 +159,6 @@ export default async function AdminHome() {
     <>
       <AdminPageHeader
         title={`Olá, ${firstName}`}
-        description={
-          isAdmin
-            ? "Resumo do conteúdo do Radar de Internacionalização."
-            : "Os seus conteúdos no Radar de Internacionalização."
-        }
         action={
           <Link
             href="/admin/publicacoes/nova"
@@ -227,7 +216,11 @@ export default async function AdminHome() {
               <p className="mt-1 font-display text-sm font-semibold text-ink/75">
                 {stat.label}
               </p>
-              <p className="mt-0.5 font-body text-xs text-ink/50">{stat.hint}</p>
+              {stat.hint && (
+                <p className="mt-0.5 font-body text-xs text-ink/50">
+                  {stat.hint}
+                </p>
+              )}
             </Link>
           );
         })}

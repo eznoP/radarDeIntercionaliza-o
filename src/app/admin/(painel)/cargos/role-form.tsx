@@ -35,11 +35,7 @@ export function RoleForm({
         />
       </Field>
 
-      <Field
-        label="Descrição"
-        htmlFor="description"
-        hint="Opcional."
-      >
+      <Field label="Descrição" htmlFor="description">
         <textarea
           id="description"
           name="description"
@@ -50,11 +46,7 @@ export function RoleForm({
         />
       </Field>
 
-      <Field
-        label="Ordem"
-        htmlFor="sort_order"
-        hint="Opcional."
-      >
+      <Field label="Ordem" htmlFor="sort_order">
         <input
           id="sort_order"
           name="sort_order"

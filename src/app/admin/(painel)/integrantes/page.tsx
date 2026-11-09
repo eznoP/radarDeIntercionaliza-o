@@ -4,7 +4,7 @@ import { AdminAlert } from "@/components/admin/admin-alert";
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { FormActionButton } from "@/components/admin/form-action-button";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentProfile } from "@/lib/supabase/server";
 import { adminConfigured } from "@/lib/admin/guard";
 import type { ProfileStatus } from "@/lib/database.types";
 import { approveIntegrante, deleteIntegrante } from "./actions";
@@ -54,13 +54,16 @@ export default async function IntegrantesPage({
 
   const supabase = await createClient();
 
-  const [{ data: profiles }, { data: roles }] = await Promise.all([
+  const [profileData, { data: profiles }, { data: roles }] = await Promise.all([
+    getCurrentProfile(),
     supabase
       .from("profiles")
       .select("*")
       .order("full_name", { ascending: true }),
     supabase.from("roles").select("id, name"),
   ]);
+
+  const myId = profileData?.profile?.id;
 
   const all = profiles ?? [];
   const roleName = new Map((roles ?? []).map((r) => [r.id, r.name]));
@@ -191,27 +194,35 @@ export default async function IntegrantesPage({
                 </div>
 
                 <div className="flex shrink-0 items-center gap-1">
-                  {p.status === "pending" && (
-                    <FormActionButton
-                      action={approveIntegrante.bind(null, p.id)}
-                      pendingLabel="Aprovando…"
-                      className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                    >
-                      <CheckCircle2 className="h-3.5 w-3.5" />
-                      Aprovar
-                    </FormActionButton>
+                  {p.id === myId ? (
+                    <span className="px-2.5 py-1.5 font-display text-xs font-medium text-ink/40">
+                      Você
+                    </span>
+                  ) : (
+                    <>
+                      {p.status === "pending" && (
+                        <FormActionButton
+                          action={approveIntegrante.bind(null, p.id)}
+                          pendingLabel="Aprovando…"
+                          className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                        >
+                          <CheckCircle2 className="h-3.5 w-3.5" />
+                          Aprovar
+                        </FormActionButton>
+                      )}
+                      <Link
+                        href={`/admin/integrantes/${p.id}`}
+                        className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 font-display text-xs font-semibold text-glaucous transition hover:bg-glaucous/10"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                        Editar
+                      </Link>
+                      <DeleteButton
+                        action={deleteIntegrante.bind(null, p.id)}
+                        confirmText={`Excluir o integrante "${p.full_name}"?`}
+                      />
+                    </>
                   )}
-                  <Link
-                    href={`/admin/integrantes/${p.id}`}
-                    className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 font-display text-xs font-semibold text-glaucous transition hover:bg-glaucous/10"
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                    Editar
-                  </Link>
-                  <DeleteButton
-                    action={deleteIntegrante.bind(null, p.id)}
-                    confirmText={`Excluir o integrante "${p.full_name}"?`}
-                  />
                 </div>
               </li>
             ))}

@@ -32,7 +32,6 @@ export default async function EditarIntegrantePage({
     <>
       <AdminPageHeader
         title="Editar integrante"
-        description={`Atualize os dados de "${integrante.full_name}".`}
         action={
           <Link
             href="/admin/integrantes"

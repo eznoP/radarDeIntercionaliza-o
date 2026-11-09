@@ -48,7 +48,7 @@ export default async function CategoriasPage({
 
           {list.length === 0 ? (
             <p className="px-5 py-10 text-center font-body text-sm text-ink/50">
-              Nenhuma categoria cadastrada ainda. Crie a primeira ao lado.
+              Nenhuma categoria cadastrada.
             </p>
           ) : (
             <ul className="divide-y divide-dark-green/10">
@@ -61,11 +61,8 @@ export default async function CategoriasPage({
                     <p className="font-display text-sm font-semibold text-dark-green">
                       {category.name}
                     </p>
-                    <p className="mt-0.5 truncate font-mono text-xs text-ink/45">
-                      /{category.slug}
-                    </p>
                     {category.description && (
-                      <p className="mt-1 font-body text-xs text-ink/60">
+                      <p className="mt-0.5 font-body text-xs text-ink/60">
                         {category.description}
                       </p>
                     )}
