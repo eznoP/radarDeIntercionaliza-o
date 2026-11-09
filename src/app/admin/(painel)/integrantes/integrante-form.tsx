@@ -7,6 +7,7 @@ import { MediaUploader } from "@/components/admin/media-uploader";
 import { Field, fieldInputClass } from "@/components/admin/fields";
 import { FormMessage } from "@/components/admin/form-message";
 import { AccessInput } from "@/components/access-input";
+import { PasswordInput } from "@/components/password-input";
 import { initialFormState } from "@/lib/admin/types";
 import { ACCESS_HINT } from "@/lib/access";
 import type { ProfileStatus, Tables } from "@/lib/database.types";
@@ -237,12 +238,12 @@ export function IntegranteForm({
             required
             error={state.fieldErrors?.password}
           >
-            <input
+            <PasswordInput
               id="password"
               name="password"
-              type="text"
               autoComplete="new-password"
               placeholder="Mínimo de 6 caracteres"
+              invalid={Boolean(state.fieldErrors?.password)}
               className={fieldInputClass(Boolean(state.fieldErrors?.password))}
             />
           </Field>
@@ -255,12 +256,12 @@ export function IntegranteForm({
             error={state.fieldErrors?.password}
             hint="Deixe em branco para manter a senha atual."
           >
-            <input
+            <PasswordInput
               id="password"
               name="password"
-              type="text"
               autoComplete="new-password"
               placeholder="Nova senha (opcional)"
+              invalid={Boolean(state.fieldErrors?.password)}
               className={fieldInputClass(Boolean(state.fieldErrors?.password))}
             />
           </Field>

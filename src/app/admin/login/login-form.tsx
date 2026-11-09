@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { signIn } from "@/app/admin/actions";
 import { initialFormState } from "@/lib/admin/types";
 import { AccessInput } from "@/components/access-input";
+import { PasswordInput } from "@/components/password-input";
 import { cn } from "@/lib/utils";
 
 export function LoginForm({ redirectTo }: { redirectTo?: string }) {
@@ -47,13 +48,11 @@ export function LoginForm({ redirectTo }: { redirectTo?: string }) {
         >
           Senha
         </label>
-        <input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
-          autoComplete="current-password"
           placeholder="••••••••"
-          aria-invalid={Boolean(state.fieldErrors?.password)}
+          invalid={Boolean(state.fieldErrors?.password)}
           className={cn(
             "w-full rounded-xl border bg-white px-4 py-3 font-body text-sm text-ink outline-none transition",
             "placeholder:text-ink/35 focus:ring-2 focus:ring-moss/40",

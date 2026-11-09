@@ -5,6 +5,7 @@ import { CircleCheck } from "lucide-react";
 import { signUpIntegrante } from "@/app/cadastro/actions";
 import { initialFormState } from "@/lib/admin/types";
 import { AccessInput } from "@/components/access-input";
+import { PasswordInput } from "@/components/password-input";
 import { cn } from "@/lib/utils";
 
 function inputClass(hasError: boolean) {
@@ -100,13 +101,12 @@ export function SignupForm() {
           >
             Senha
           </label>
-          <input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             autoComplete="new-password"
             placeholder="••••••••"
-            aria-invalid={Boolean(state.fieldErrors?.password)}
+            invalid={Boolean(state.fieldErrors?.password)}
             className={inputClass(Boolean(state.fieldErrors?.password))}
           />
           <FieldError message={state.fieldErrors?.password} />
@@ -119,13 +119,12 @@ export function SignupForm() {
           >
             Confirmar a senha
           </label>
-          <input
+          <PasswordInput
             id="confirm"
             name="confirm"
-            type="password"
             autoComplete="new-password"
             placeholder="••••••••"
-            aria-invalid={Boolean(state.fieldErrors?.confirm)}
+            invalid={Boolean(state.fieldErrors?.confirm)}
             className={inputClass(Boolean(state.fieldErrors?.confirm))}
           />
           <FieldError message={state.fieldErrors?.confirm} />
