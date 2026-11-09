@@ -68,8 +68,7 @@ export default async function MeuPerfilPage() {
                   <Clock className="mt-0.5 h-4 w-4 shrink-0" />
                   <span>
                     O seu perfil está <strong>aguardando aprovação</strong> do
-                    gestor. Assim que for aprovado, ele aparecerá no site e você
-                    ganhará acesso ao painel para publicar.
+                    gestor.
                   </span>
                 </div>
               )}

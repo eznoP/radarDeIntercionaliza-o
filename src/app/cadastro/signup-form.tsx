@@ -33,16 +33,13 @@ export function SignupForm() {
         </div>
         <div className="space-y-1.5">
           <h2 className="font-display text-lg font-semibold text-dark-green">
-            Solicitação registrada
+            Acesso solicitado
           </h2>
           <p className="font-body text-sm text-ink/60">{state.message}</p>
         </div>
-        <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800 ring-1 ring-amber-200">
-          Enquanto o seu acesso não for aprovado, você não conseguirá entrar.
-        </p>
         <p className="font-body text-xs text-ink/50">
           <a href="/admin/login" className="underline-offset-2 hover:underline">
-            Voltar para a tela de entrar
+            Voltar para o login
           </a>
         </p>
       </div>
@@ -89,10 +86,6 @@ export function SignupForm() {
           className={inputClass(Boolean(state.fieldErrors?.access))}
         />
         <FieldError message={state.fieldErrors?.access} />
-        <p className="font-body text-xs text-ink/45">
-          É o identificador que você usará para entrar. Ex.:{" "}
-          <span className="font-medium text-ink/60">joao.silva</span>
-        </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -155,10 +148,6 @@ export function SignupForm() {
       >
         {pending ? "Enviando…" : "Solicitar o acesso"}
       </button>
-
-      <p className="text-center font-body text-xs text-ink/45">
-        A solicitação passa pela revisão do gestor antes de liberar o acesso.
-      </p>
     </form>
   );
 }

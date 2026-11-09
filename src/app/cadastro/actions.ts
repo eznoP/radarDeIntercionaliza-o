@@ -105,7 +105,7 @@ export async function signUpIntegrante(
       );
     }
     return errorState(
-      "Não foi possível criar o cadastro. Tente novamente ou fale com o gestor.",
+      "Não foi possível criar o cadastro. Tente novamente em instantes.",
     );
   }
 
@@ -148,11 +148,11 @@ export async function signUpIntegrante(
       // best-effort
     }
     return errorState(
-      "Não foi possível registrar a solicitação. Tente novamente ou fale com o gestor.",
+      "Não foi possível concluir o cadastro. Tente novamente em instantes.",
     );
   }
 
   return successState(
-    "Cadastro enviado! O gestor vai revisar a sua solicitação e liberar o acesso.",
+    "Cadastro enviado. Aguarde a aprovação do gestor.",
   );
 }

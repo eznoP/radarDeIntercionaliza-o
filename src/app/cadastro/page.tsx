@@ -12,21 +12,9 @@ export const metadata: Metadata = {
 };
 
 const PASSOS = [
-  {
-    icon: Inbox,
-    titulo: "Você envia",
-    texto: "Preenche o formulário com o seu acesso.",
-  },
-  {
-    icon: UserCheck,
-    titulo: "O gestor aprova",
-    texto: "A revisão acontece no painel do projeto.",
-  },
-  {
-    icon: BadgeCheck,
-    titulo: "Você entra",
-    texto: "Aprovado, o login é liberado na hora.",
-  },
+  { icon: Inbox, titulo: "Você envia" },
+  { icon: UserCheck, titulo: "O gestor aprova" },
+  { icon: BadgeCheck, titulo: "Você entra" },
 ];
 
 export default async function CadastroPage() {
@@ -70,9 +58,6 @@ export default async function CadastroPage() {
           <h1 className="mt-3 font-display text-xl font-semibold text-dark-green">
             Solicitar acesso
           </h1>
-          <p className="mt-1 font-body text-sm text-ink/65">
-            Para integrantes do projeto que ainda não possuem conta.
-          </p>
         </div>
 
         {/* Como funciona, em três passos */}
@@ -84,9 +69,6 @@ export default async function CadastroPage() {
               </span>
               <p className="mt-1.5 font-display text-xs font-semibold text-dark-green">
                 {passo.titulo}
-              </p>
-              <p className="mt-0.5 hidden font-body text-[11px] leading-snug text-ink/55 sm:block">
-                {passo.texto}
               </p>
               {i < PASSOS.length - 1 && (
                 <span className="sr-only">; depois, {PASSOS[i + 1].titulo}</span>

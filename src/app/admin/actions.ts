@@ -10,7 +10,7 @@ const AUTH_MESSAGES: Record<string, string> = {
   // Um cadastro auto-registrado nasce sem o e-mail interno confirmado:
   // ele só passa a autenticar (e assim obter acesso) depois da aprovação.
   "Email not confirmed":
-    "O seu acesso ainda não foi liberado pelo gestor. Assim que a aprovação sair, tente entrar novamente.",
+    "Este acesso ainda não foi liberado pelo gestor.",
   "Too many requests": "Muitas tentativas. Aguarde alguns instantes.",
 };
 

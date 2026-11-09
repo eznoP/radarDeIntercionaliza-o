@@ -328,7 +328,7 @@ export async function updateIntegrante(
     if (authError) {
       redirect(
         `${LIST_PATH}?erro=${encodeURIComponent(
-          `Integrante atualizado, mas houve um problema para liberar o login: ${authError}.`,
+          `Integrante atualizado, mas o login não foi liberado: ${authError}.`,
         )}`,
       );
     }
@@ -395,7 +395,7 @@ export async function approveIntegrante(id: string): Promise<void> {
     if (authError) {
       redirect(
         `${LIST_PATH}?erro=${encodeURIComponent(
-          `Perfil aprovado, mas houve um problema para liberar o login: ${authError}.`,
+          `Perfil aprovado, mas o login não foi liberado: ${authError}.`,
         )}`,
       );
     }
