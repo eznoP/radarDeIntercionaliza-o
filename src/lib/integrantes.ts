@@ -1,6 +1,7 @@
 import "server-only";
 
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { createAnonClient } from "@/lib/supabase/anon";
+import { isSupabaseConfigured } from "@/lib/supabase/server";
 
 /** Integrante já aprovado, no formato exibido na página pública. */
 export type IntegrantePublico = {
@@ -24,7 +25,7 @@ export async function getApprovedIntegrantes(): Promise<IntegrantePublico[]> {
   if (!isSupabaseConfigured()) return [];
 
   try {
-    const supabase = await createClient();
+    const supabase = createAnonClient();
     const { data, error } = await supabase
       .from("profiles")
       .select(

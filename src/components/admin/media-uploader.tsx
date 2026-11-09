@@ -41,6 +41,21 @@ export function MediaUploader({
     setError(null);
     setBusy(true);
     setProgress(0);
+    if (file.size > 50 * 1024 * 1024) {
+      setError("Arquivo grande demais (limite de 50 MB).");
+      setBusy(false);
+      return;
+    }
+    if (kind === "image" && !file.type.startsWith("image/")) {
+      setError("Envie um arquivo de imagem.");
+      setBusy(false);
+      return;
+    }
+    if (kind === "video" && !file.type.startsWith("video/")) {
+      setError("Envie um arquivo de vídeo.");
+      setBusy(false);
+      return;
+    }
     try {
       const converted =
         kind === "image"

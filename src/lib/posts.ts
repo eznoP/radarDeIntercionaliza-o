@@ -1,6 +1,7 @@
 import "server-only";
 
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { createAnonClient } from "@/lib/supabase/anon";
+import { isSupabaseConfigured } from "@/lib/supabase/server";
 import type { PostCardData, PostDetail } from "@/lib/post";
 
 /** Reexporta o tipo para quem consome as publicações pelo servidor. */
@@ -14,7 +15,7 @@ export async function getPublishedPosts(limit = 12): Promise<PostCardData[]> {
   if (!isSupabaseConfigured()) return [];
 
   try {
-    const supabase = await createClient();
+    const supabase = createAnonClient();
     const { data: rows, error } = await supabase
       .from("posts")
       .select(
@@ -54,7 +55,7 @@ export async function getPostBySlug(slug: string): Promise<PostDetail | null> {
   if (!isSupabaseConfigured()) return null;
 
   try {
-    const supabase = await createClient();
+    const supabase = createAnonClient();
     const { data: row, error } = await supabase
       .from("posts")
       .select("*")

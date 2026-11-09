@@ -13,6 +13,8 @@ export const metadata: Metadata = {
     "Conheça as pessoas que constroem o Radar de Internacionalização.",
 };
 
+export const revalidate = 300;
+
 export default async function IntegrantesPage() {
   const integrantes = await getApprovedIntegrantes();
 

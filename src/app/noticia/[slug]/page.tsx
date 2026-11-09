@@ -31,6 +31,8 @@ export async function generateMetadata({
   };
 }
 
+export const revalidate = 300;
+
 export default async function NoticiaPage({ params }: PageProps) {
   const { slug } = await params;
   const post = await getPostBySlug(slug);

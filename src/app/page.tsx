@@ -8,6 +8,8 @@ import { GlobeGrid } from "@/components/brand-icons";
 import { getPublishedPosts } from "@/lib/posts";
 import { site } from "@/lib/site-config";
 
+export const revalidate = 300;
+
 export default async function HomePage() {
   const posts = await getPublishedPosts();
   return (
