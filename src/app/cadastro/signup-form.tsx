@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { CircleCheck } from "lucide-react";
 import { signUpIntegrante } from "@/app/cadastro/actions";
 import { initialFormState } from "@/lib/admin/types";
+import { AccessInput } from "@/components/access-input";
 import { cn } from "@/lib/utils";
 
 function inputClass(hasError: boolean) {
@@ -74,18 +75,21 @@ export function SignupForm() {
         >
           Acesso
         </label>
-        <input
+        <AccessInput
           id="access"
           name="access"
-          type="text"
-          autoComplete="username"
-          autoCapitalize="none"
-          spellCheck={false}
-          placeholder="seu.acesso"
-          aria-invalid={Boolean(state.fieldErrors?.access)}
+          placeholder="joao.silva"
+          invalid={Boolean(state.fieldErrors?.access)}
           className={inputClass(Boolean(state.fieldErrors?.access))}
         />
         <FieldError message={state.fieldErrors?.access} />
+        <p className="font-body text-xs text-ink/50">
+          Ex.:{" "}
+          <span aria-hidden className="text-ink/70">
+            joao.silva
+          </span>
+          <span className="text-ink/40">@integrantes.radar</span>
+        </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

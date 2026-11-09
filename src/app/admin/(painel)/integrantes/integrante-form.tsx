@@ -6,6 +6,7 @@ import { KeyRound, Loader2 } from "lucide-react";
 import { MediaUploader } from "@/components/admin/media-uploader";
 import { Field, fieldInputClass } from "@/components/admin/fields";
 import { FormMessage } from "@/components/admin/form-message";
+import { AccessInput } from "@/components/access-input";
 import { initialFormState } from "@/lib/admin/types";
 import { ACCESS_HINT } from "@/lib/access";
 import type { ProfileStatus, Tables } from "@/lib/database.types";
@@ -90,17 +91,16 @@ export function IntegranteForm({
           error={state.fieldErrors?.access ?? accessWarning ?? undefined}
           hint={checking ? "Verificando…" : "Nome usado para entrar (login)."}
         >
-          <input
+          <AccessInput
             id="access"
             name="access"
             defaultValue={integrante?.access ?? ""}
             placeholder="maria.silva"
-            autoCapitalize="none"
-            spellCheck={false}
-            onBlur={(e) => handleAccessBlur(e.target.value)}
+            invalid={Boolean(state.fieldErrors?.access || accessWarning)}
             className={fieldInputClass(
               Boolean(state.fieldErrors?.access || accessWarning),
             )}
+            onBlur={(value) => handleAccessBlur(value)}
           />
         </Field>
       </div>
