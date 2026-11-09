@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { BadgeCheck, Inbox, UserCheck } from "lucide-react";
 import { getCurrentProfile, isSupabaseConfigured } from "@/lib/supabase/server";
 import { SignupForm } from "./signup-form";
 
@@ -10,12 +9,6 @@ export const metadata: Metadata = {
   title: "Solicitar acesso",
   robots: { index: false, follow: false },
 };
-
-const PASSOS = [
-  { icon: Inbox, titulo: "Você envia" },
-  { icon: UserCheck, titulo: "O gestor aprova" },
-  { icon: BadgeCheck, titulo: "Você entra" },
-];
 
 export default async function CadastroPage() {
   // Quem já está logado (ou pendente) não precisa se cadastrar.
@@ -58,23 +51,6 @@ export default async function CadastroPage() {
           <h1 className="mt-3 font-display text-xl font-semibold text-dark-green">
             Solicitar acesso
           </h1>
-        </div>
-
-        {/* Como funciona, em três passos */}
-        <div className="grid grid-cols-3 gap-2 border-b border-dark-green/10 bg-sand/40 px-5 py-4">
-          {PASSOS.map((passo, i) => (
-            <div key={passo.titulo} className="text-center">
-              <span className="mx-auto grid h-8 w-8 place-items-center rounded-full bg-dark-green text-moss">
-                <passo.icon className="h-4 w-4" />
-              </span>
-              <p className="mt-1.5 font-display text-xs font-semibold text-dark-green">
-                {passo.titulo}
-              </p>
-              {i < PASSOS.length - 1 && (
-                <span className="sr-only">; depois, {PASSOS[i + 1].titulo}</span>
-              )}
-            </div>
-          ))}
         </div>
 
         <div className="p-7 sm:p-8">
