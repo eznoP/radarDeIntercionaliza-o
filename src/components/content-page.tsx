@@ -43,7 +43,7 @@ export function ContentPage({
         </section>
 
         <div className="mx-auto w-full max-w-[720px] px-5 py-12 sm:px-8 sm:py-16">
-          <div className="space-y-5 font-body text-[1.02rem] leading-relaxed text-ink/75">
+          <div className="space-y-5 font-body text-lg leading-relaxed text-ink/75">
             {children}
           </div>
         </div>
