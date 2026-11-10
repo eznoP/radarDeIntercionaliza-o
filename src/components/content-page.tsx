@@ -2,7 +2,6 @@ import Image from "next/image";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { BackToTop } from "@/components/back-to-top";
-import { site } from "@/lib/site-config";
 
 /**
  * Página de conteúdo textual do site: hero escuro com a marca + corpo
@@ -37,10 +36,7 @@ export function ContentPage({
             className="pointer-events-none absolute -right-20 -top-16 hidden w-[380px] opacity-[0.08] select-none sm:block"
           />
           <div className="relative mx-auto w-full max-w-5xl px-5 py-14 sm:px-8 sm:py-16">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 font-display text-[11px] font-semibold uppercase tracking-wider text-vanilla">
-              {site.name}
-            </span>
-            <h1 className="mt-4 font-display text-4xl font-bold sm:text-5xl">
+            <h1 className="font-display text-4xl font-bold sm:text-5xl">
               {title}
             </h1>
           </div>
