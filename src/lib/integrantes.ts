@@ -13,7 +13,8 @@ export type IntegrantePublico = {
   avatarUrl: string | null;
   linkedinUrl: string | null;
   lattesUrl: string | null;
-  websiteUrl: string | null;
+  portfolioEmail: string | null;
+  funcao: string | null;
 };
 
 /**
@@ -29,7 +30,7 @@ export async function getApprovedIntegrantes(): Promise<IntegrantePublico[]> {
     const { data, error } = await supabase
       .from("profiles")
       .select(
-        "id, slug, full_name, bio, avatar_url, linkedin_url, lattes_url, website_url, role_id, is_admin, status",
+        "id, slug, full_name, bio, avatar_url, linkedin_url, lattes_url, portfolio_email, funcao, role_id, is_admin, status",
       )
       .eq("status", "approved")
       .eq("is_admin", false)
@@ -49,7 +50,8 @@ export async function getApprovedIntegrantes(): Promise<IntegrantePublico[]> {
       avatarUrl: row.avatar_url,
       linkedinUrl: row.linkedin_url,
       lattesUrl: row.lattes_url,
-      websiteUrl: row.website_url,
+      portfolioEmail: row.portfolio_email ?? null,
+      funcao: row.funcao ?? null,
     }));
   } catch {
     return [];

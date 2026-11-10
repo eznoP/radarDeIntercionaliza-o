@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { FileText, Globe, Linkedin, LogIn, UserRound } from "lucide-react";
+import { FileText, Linkedin, LogIn, Mail, UserRound } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { BackToTop } from "@/components/back-to-top";
 import { getApprovedIntegrantes } from "@/lib/integrantes";
+import { funcaoLabel } from "@/lib/member-funcao";
 
 export const metadata: Metadata = {
   title: "Integrantes",
@@ -88,13 +89,18 @@ export default async function IntegrantesPage() {
                       {p.role}
                     </span>
                   )}
+                  {funcaoLabel(p.funcao) && (
+                    <span className="mt-1.5 block font-display text-[10px] font-semibold uppercase tracking-wide text-ink/45">
+                      {funcaoLabel(p.funcao)}
+                    </span>
+                  )}
                   {p.bio && (
                     <p className="mt-3 font-body text-sm leading-relaxed text-ink/65">
                       {p.bio}
                     </p>
                   )}
 
-                  {(p.linkedinUrl || p.lattesUrl || p.websiteUrl) && (
+                  {(p.linkedinUrl || p.lattesUrl || p.portfolioEmail) && (
                     <div className="mt-4 flex items-center gap-2 pt-2">
                       {p.linkedinUrl && (
                         <SocialLink href={p.linkedinUrl} label="LinkedIn">
@@ -106,9 +112,9 @@ export default async function IntegrantesPage() {
                           <FileText className="h-4 w-4" />
                         </SocialLink>
                       )}
-                      {p.websiteUrl && (
-                        <SocialLink href={p.websiteUrl} label="Site ou contato">
-                          <Globe className="h-4 w-4" />
+                      {p.portfolioEmail && (
+                        <SocialLink href={`mailto:${p.portfolioEmail}`} label="Email">
+                          <Mail className="h-4 w-4" />
                         </SocialLink>
                       )}
                     </div>

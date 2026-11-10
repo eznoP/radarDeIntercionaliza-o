@@ -8,6 +8,10 @@ import {
   type FormState,
 } from "@/lib/admin/types";
 import { optionalText, requiredText } from "@/lib/admin/validation";
+import {
+  FUNCAO_VALUES,
+  type MemberFuncao,
+} from "@/lib/member-funcao";
 
 const PROFILE_PATH = "/meu-perfil";
 
@@ -41,7 +45,16 @@ export async function updateMyProfile(
   const avatar_url = optionalText(formData, "avatar_url");
   const linkedin_url = readUrl(formData, "linkedin_url");
   const lattes_url = readUrl(formData, "lattes_url");
-  const website_url = readUrl(formData, "website_url");
+
+  const portfolio_email = optionalText(formData, "portfolio_email");
+  if (portfolio_email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(portfolio_email)) {
+    errors.portfolio_email = "Insira um e-mail válido.";
+  }
+
+  const funcaoRaw = optionalText(formData, "funcao") as MemberFuncao;
+  const funcao: MemberFuncao | null = FUNCAO_VALUES.includes(funcaoRaw)
+    ? funcaoRaw
+    : null;
 
   if (Object.keys(errors).length) {
     return errorState("Preencha os campos destacados.", errors);
@@ -56,7 +69,8 @@ export async function updateMyProfile(
       avatar_url: avatar_url || null,
       linkedin_url: linkedin_url || null,
       lattes_url: lattes_url || null,
-      website_url: website_url || null,
+      portfolio_email: portfolio_email || null,
+      funcao: funcao,
     })
     .eq("user_id", user.id);
 

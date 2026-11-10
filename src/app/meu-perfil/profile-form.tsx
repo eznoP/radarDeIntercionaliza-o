@@ -7,6 +7,7 @@ import { AvatarUploader } from "@/components/avatar-uploader";
 import { Field, fieldInputClass } from "@/components/admin/fields";
 import { FormMessage } from "@/components/admin/form-message";
 import { initialFormState } from "@/lib/admin/types";
+import { FUNCOES } from "@/lib/member-funcao";
 import type { Tables } from "@/lib/database.types";
 import { updateMyProfile } from "./actions";
 
@@ -48,25 +49,39 @@ export function ProfileForm({
         />
       </Field>
 
-      <Field
-        label="Cargo"
-        htmlFor="role_id"
-        hint="Opcional."
-      >
-        <select
-          id="role_id"
-          name="role_id"
-          defaultValue={profile.role_id ?? ""}
-          className={fieldInputClass(false)}
-        >
-          <option value="">Sem cargo</option>
-          {roles.map((role) => (
-            <option key={role.id} value={role.id}>
-              {role.name}
-            </option>
-          ))}
-        </select>
-      </Field>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Cargo" htmlFor="role_id">
+          <select
+            id="role_id"
+            name="role_id"
+            defaultValue={profile.role_id ?? ""}
+            className={fieldInputClass(false)}
+          >
+            <option value="">Sem cargo</option>
+            {roles.map((role) => (
+              <option key={role.id} value={role.id}>
+                {role.name}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <Field label="Função" htmlFor="funcao">
+          <select
+            id="funcao"
+            name="funcao"
+            defaultValue={profile.funcao ?? ""}
+            className={fieldInputClass(false)}
+          >
+            <option value="">Não informada</option>
+            {FUNCOES.map((f) => (
+              <option key={f.value} value={f.value}>
+                {f.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+      </div>
 
       <Field
         label="Descrição"
@@ -84,7 +99,7 @@ export function ProfileForm({
       </Field>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <Field label="LinkedIn" htmlFor="linkedin_url" hint="Opcional.">
+        <Field label="LinkedIn" htmlFor="linkedin_url">
           <input
             id="linkedin_url"
             name="linkedin_url"
@@ -94,7 +109,7 @@ export function ProfileForm({
             className={fieldInputClass(false)}
           />
         </Field>
-        <Field label="Lattes" htmlFor="lattes_url" hint="Opcional.">
+        <Field label="Lattes" htmlFor="lattes_url">
           <input
             id="lattes_url"
             name="lattes_url"
@@ -104,14 +119,20 @@ export function ProfileForm({
             className={fieldInputClass(false)}
           />
         </Field>
-        <Field label="Site / contato" htmlFor="website_url" hint="Opcional.">
+        <Field
+          label="Email"
+          htmlFor="portfolio_email"
+          error={state.fieldErrors?.portfolio_email}
+        >
           <input
-            id="website_url"
-            name="website_url"
-            type="url"
-            defaultValue={profile.website_url ?? ""}
-            placeholder="https://…"
-            className={fieldInputClass(false)}
+            id="portfolio_email"
+            name="portfolio_email"
+            type="email"
+            defaultValue={profile.portfolio_email ?? ""}
+            placeholder="nome@email.com"
+            className={fieldInputClass(
+              Boolean(state.fieldErrors?.portfolio_email),
+            )}
           />
         </Field>
       </div>

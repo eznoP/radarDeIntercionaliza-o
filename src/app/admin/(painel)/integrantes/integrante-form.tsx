@@ -9,6 +9,7 @@ import { FormMessage } from "@/components/admin/form-message";
 import { AccessInput } from "@/components/access-input";
 import { PasswordInput } from "@/components/password-input";
 import { initialFormState } from "@/lib/admin/types";
+import { FUNCOES } from "@/lib/member-funcao";
 import { ACCESS_HINT } from "@/lib/access";
 import type { ProfileStatus, Tables } from "@/lib/database.types";
 import {
@@ -123,7 +124,25 @@ export function IntegranteForm({
           </select>
         </Field>
 
-        <Field label="LinkedIn" htmlFor="linkedin_url" hint="Opcional.">
+        <Field label="Função" htmlFor="funcao" error={state.fieldErrors?.funcao}>
+          <select
+            id="funcao"
+            name="funcao"
+            defaultValue={integrante?.funcao ?? ""}
+            className={fieldInputClass(false)}
+          >
+            <option value="">Não informada</option>
+            {FUNCOES.map((f) => (
+              <option key={f.value} value={f.value}>
+                {f.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="LinkedIn" htmlFor="linkedin_url">
           <input
             id="linkedin_url"
             name="linkedin_url"
@@ -133,10 +152,8 @@ export function IntegranteForm({
             className={fieldInputClass(false)}
           />
         </Field>
-      </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Currículo Lattes" htmlFor="lattes_url" hint="Opcional.">
+        <Field label="Currículo Lattes" htmlFor="lattes_url">
           <input
             id="lattes_url"
             name="lattes_url"
@@ -146,18 +163,24 @@ export function IntegranteForm({
             className={fieldInputClass(false)}
           />
         </Field>
-
-        <Field label="Site / contato" htmlFor="website_url" hint="Opcional.">
-          <input
-            id="website_url"
-            name="website_url"
-            type="url"
-            defaultValue={integrante?.website_url ?? ""}
-            placeholder="https://…"
-            className={fieldInputClass(false)}
-          />
-        </Field>
       </div>
+
+      <Field
+        label="Email"
+        htmlFor="portfolio_email"
+        error={state.fieldErrors?.portfolio_email}
+      >
+        <input
+          id="portfolio_email"
+          name="portfolio_email"
+          type="email"
+          defaultValue={integrante?.portfolio_email ?? ""}
+          placeholder="nome@email.com"
+          className={fieldInputClass(
+            Boolean(state.fieldErrors?.portfolio_email),
+          )}
+        />
+      </Field>
 
       <Field
         label="Biografia"

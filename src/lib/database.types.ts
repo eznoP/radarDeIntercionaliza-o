@@ -130,6 +130,8 @@ export type Database = {
           linkedin_url: string | null;
           lattes_url: string | null;
           website_url: string | null;
+          portfolio_email: string | null;
+          funcao: string | null;
           status: ProfileStatus;
           is_active: boolean;
           is_admin: boolean;
@@ -149,6 +151,8 @@ export type Database = {
           linkedin_url?: string | null;
           lattes_url?: string | null;
           website_url?: string | null;
+          portfolio_email?: string | null;
+          funcao?: string | null;
           status?: ProfileStatus;
           is_active?: boolean;
           is_admin?: boolean;
@@ -168,6 +172,8 @@ export type Database = {
           linkedin_url?: string | null;
           lattes_url?: string | null;
           website_url?: string | null;
+          portfolio_email?: string | null;
+          funcao?: string | null;
           status?: ProfileStatus;
           is_active?: boolean;
           is_admin?: boolean;

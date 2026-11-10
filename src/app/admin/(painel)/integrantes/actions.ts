@@ -16,6 +16,10 @@ import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/slugify";
 import type { ProfileStatus } from "@/lib/database.types";
+import {
+  FUNCAO_VALUES,
+  type MemberFuncao,
+} from "@/lib/member-funcao";
 
 const LIST_PATH = "/admin/integrantes";
 const STATUSES: ProfileStatus[] = ["pending", "approved", "inactive"];
@@ -43,7 +47,19 @@ function readForm(formData: FormData) {
   const avatar_url = optionalText(formData, "avatar_url");
   const linkedin_url = optionalText(formData, "linkedin_url");
   const lattes_url = optionalText(formData, "lattes_url");
-  const website_url = optionalText(formData, "website_url");
+
+  const portfolio_email = optionalText(formData, "portfolio_email");
+  if (
+    portfolio_email &&
+    !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(portfolio_email)
+  ) {
+    errors.portfolio_email = "Insira um e-mail válido.";
+  }
+
+  const funcaoRaw = optionalText(formData, "funcao") as MemberFuncao;
+  const funcao: MemberFuncao | null = FUNCAO_VALUES.includes(funcaoRaw)
+    ? funcaoRaw
+    : null;
 
   const rawStatus = optionalText(formData, "status") as ProfileStatus;
   const status: ProfileStatus = STATUSES.includes(rawStatus)
@@ -61,7 +77,8 @@ function readForm(formData: FormData) {
     avatar_url,
     linkedin_url,
     lattes_url,
-    website_url,
+    portfolio_email,
+    funcao,
     status,
   };
 }
@@ -216,7 +233,8 @@ export async function createIntegrante(
     avatar_url: f.avatar_url || null,
     linkedin_url: f.linkedin_url || null,
     lattes_url: f.lattes_url || null,
-    website_url: f.website_url || null,
+    portfolio_email: f.portfolio_email || null,
+    funcao: f.funcao,
     status: f.status,
     is_active: f.status !== "inactive",
     is_admin: false,
@@ -311,7 +329,8 @@ export async function updateIntegrante(
       avatar_url: f.avatar_url || null,
       linkedin_url: f.linkedin_url || null,
       lattes_url: f.lattes_url || null,
-      website_url: f.website_url || null,
+      portfolio_email: f.portfolio_email || null,
+      funcao: f.funcao,
       status,
       is_active: status !== "inactive",
     })

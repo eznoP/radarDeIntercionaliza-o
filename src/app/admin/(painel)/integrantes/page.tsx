@@ -8,6 +8,7 @@ import { createClient, getCurrentProfile } from "@/lib/supabase/server";
 import { adminConfigured } from "@/lib/admin/guard";
 import type { ProfileStatus } from "@/lib/database.types";
 import { approveIntegrante, deleteIntegrante } from "./actions";
+import { funcaoLabel } from "@/lib/member-funcao";
 import { cn } from "@/lib/utils";
 
 export const metadata = { title: "Integrantes" };
@@ -190,6 +191,7 @@ export default async function IntegrantesPage({
                     {p.role_id && roleName.has(p.role_id)
                       ? ` · ${roleName.get(p.role_id)}`
                       : ""}
+                    {funcaoLabel(p.funcao) ? ` · ${funcaoLabel(p.funcao)}` : ""}
                   </p>
                 </div>
 
