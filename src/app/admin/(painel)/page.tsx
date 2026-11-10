@@ -9,6 +9,7 @@ import {
   Users,
 } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/page-header";
+import { FormActionButton } from "@/components/admin/form-action-button";
 import {
   getCurrentProfile,
   createClient,
@@ -16,6 +17,7 @@ import {
 } from "@/lib/supabase/server";
 import { isAdminConfigured } from "@/lib/supabase/admin";
 import { adminConfigured } from "@/lib/admin/guard";
+import { setMaintenance } from "./manutencao-actions";
 import type { PostStatus } from "@/lib/database.types";
 
 export const metadata = { title: "Visão geral" };
@@ -26,6 +28,17 @@ async function count(table: "categories" | "roles" | "profiles") {
     .from(table)
     .select("*", { count: "exact", head: true });
   return total ?? 0;
+}
+
+/** Estado atual do modo manutenção (tabela site_config). */
+async function readMaintenance(): Promise<boolean> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("site_config")
+    .select("value")
+    .eq("key", "maintenance_mode")
+    .maybeSingle();
+  return data?.value === "on";
 }
 
 async function countPosts(
@@ -73,6 +86,7 @@ export default async function AdminHome() {
 
   const firstName =
     profile?.full_name?.split(" ")[0] ?? (isAdmin ? "gestor" : "integrante");
+  const maintenance = isAdmin ? await readMaintenance() : false;
 
   const stats: { label: string; value: number; hint?: string; href: string; icon: typeof Newspaper }[] = isAdmin
     ? [
@@ -225,6 +239,38 @@ export default async function AdminHome() {
           );
         })}
       </section>
+
+      {isAdmin && (
+        <section className="mt-8 rounded-card border border-dark-green/10 bg-white p-6 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="font-display text-lg font-semibold text-dark-green">
+                Modo manutenção
+              </h2>
+              <p className="mt-0.5 font-body text-xs text-ink/50">
+                {maintenance
+                  ? "Site público mostrando a página de manutenção."
+                  : "Site público normal."}{" "}
+                Vale para todo o site em até 30 s.
+              </p>
+            </div>
+            <FormActionButton
+              action={setMaintenance.bind(
+                null,
+                maintenance ? "off" : "on",
+              )}
+              pendingLabel="Aplicando…"
+              className={
+                maintenance
+                  ? "bg-amber-50 text-amber-800 hover:bg-amber-100"
+                  : "bg-dark-green text-white hover:bg-moss"
+              }
+            >
+              {maintenance ? "Desativar" : "Ativar"}
+            </FormActionButton>
+          </div>
+        </section>
+      )}
 
       <section className="mt-8 rounded-card border border-dark-green/10 bg-white p-6 shadow-sm">
         <h2 className="font-display text-lg font-semibold text-dark-green">
