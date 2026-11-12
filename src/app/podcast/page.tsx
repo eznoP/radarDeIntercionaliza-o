@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { BackToTop } from "@/components/back-to-top";
 import { PodcastDeck } from "@/components/podcast-deck";
+import { PodcastLibrary } from "@/components/podcast-library";
 import { getEpisodios } from "@/lib/podcast-feed";
 
 export const metadata: Metadata = {
@@ -79,50 +80,8 @@ export default async function Page() {
           </div>
         </section>
 
-        {/* Biblioteca com todos os episódios */}
-        {episodios.length > 1 && (
-          <section className="mx-auto w-full max-w-5xl px-5 pb-16 pt-10 sm:px-8">
-            <h2 className="font-display text-xl font-bold text-dark-green">
-              Biblioteca
-            </h2>
-            <p className="mt-1 font-body text-sm text-ink/50">
-              Todos os episódios publicados.
-            </p>
-            <ul className="mt-5 grid gap-4 sm:grid-cols-2">
-              {episodios.map((ep, i) => (
-                <li
-                  key={`${ep.titulo}-${i}`}
-                  className="rounded-card border border-dark-green/10 bg-white p-5 shadow-sm"
-                >
-                  <p className="font-display text-[11px] font-semibold uppercase tracking-[0.25em] text-moss">
-                    {ep.data}
-                    {ep.duracao ? ` · ${ep.duracao}` : ""}
-                  </p>
-                  <h3 className="mt-1.5 font-display text-base font-bold text-dark-green">
-                    {ep.titulo}
-                  </h3>
-                  {ep.descricao && (
-                    <p className="mt-2 line-clamp-2 font-body text-sm text-ink/60">
-                      {ep.descricao}
-                    </p>
-                  )}
-                  <audio
-                    controls
-                    preload="none"
-                    src={
-                      ep.audioUrl.startsWith("/")
-                        ? ep.audioUrl
-                        : `/api/podcast/audio?url=${encodeURIComponent(ep.audioUrl)}`
-                    }
-                    className="mt-3 w-full"
-                  >
-                    Seu navegador não suporta o player.
-                  </audio>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+        {/* Biblioteca minimizada, com botão para expandir */}
+        <PodcastLibrary episodios={episodios} />
       </main>
 
       <SiteFooter />

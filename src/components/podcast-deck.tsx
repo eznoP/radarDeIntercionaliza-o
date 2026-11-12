@@ -27,18 +27,20 @@ export function PodcastDeck({ episodios }: { episodios: Episodio[] }) {
   const voltar = () => setFrente((f) => (f - 1 + total) % total);
 
   // Da frente para trás: frente, frente+1, frente+2 …
+  // A chave é o próprio episódio: assim, ao trocar, cada card MANTÉM o nó no
+  // DOM e a transição CSS anima o deslize de um slot para o outro.
   const ordem = Array.from(
     { length: Math.min(PROFUNDIDADE + 1, total) },
-    (_, i) => episodios[(frente + i) % total],
+    (_, i) => ({ ep: episodios[(frente + i) % total], slot: i }),
   );
 
   return (
     <div>
       {/* Palco dos cards empilhados */}
       <div className="relative mx-auto h-[340px] w-full max-w-xl sm:h-[330px]">
-        {ordem.map((ep, i) => (
+        {ordem.map(({ ep, slot: i }) => (
           <article
-            key={`${ep.titulo}-${i}`}
+            key={ep.titulo}
             aria-hidden={i > 0}
             className={cn(
               "absolute inset-x-0 top-0 mx-auto w-full max-w-lg rounded-card border border-dark-green/10 bg-white p-6 shadow-md transition-all duration-300 ease-out sm:p-7",
