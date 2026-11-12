@@ -23,8 +23,12 @@ export function PodcastDeck({ episodios }: { episodios: Episodio[] }) {
   }
 
   const total = episodios.length;
-  const avancar = () => setFrente((f) => (f + 1) % total);
-  const voltar = () => setFrente((f) => (f - 1 + total) % total);
+  // Navegação limitada: o mais recente é o card inicial (índice 0) e o mais
+  // antigo é o último — sem "dar a volta". Cada extremo desativa um botão.
+  const avancar = () => setFrente((f) => Math.min(f + 1, total - 1));
+  const voltar = () => setFrente((f) => Math.max(f - 1, 0));
+  const noMaisRecente = frente === 0;
+  const noMaisAntigo = frente === total - 1;
 
   // Da frente para trás: frente, frente+1, frente+2 …
   // A chave é o próprio episódio: assim, ao trocar, cada card MANTÉM o nó no
@@ -88,8 +92,9 @@ export function PodcastDeck({ episodios }: { episodios: Episodio[] }) {
         <button
           type="button"
           onClick={voltar}
+          disabled={noMaisRecente}
           aria-label="Episódio anterior"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-dark-green shadow-sm ring-1 ring-dark-green/15 transition hover:bg-cream active:scale-90"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-dark-green shadow-sm ring-1 ring-dark-green/15 transition enabled:hover:bg-cream enabled:active:scale-90 disabled:cursor-not-allowed disabled:opacity-30"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
             <path
@@ -107,8 +112,9 @@ export function PodcastDeck({ episodios }: { episodios: Episodio[] }) {
         <button
           type="button"
           onClick={avancar}
+          disabled={noMaisAntigo}
           aria-label="Próximo episódio"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-dark-green shadow-sm ring-1 ring-dark-green/15 transition hover:bg-cream active:scale-90"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-dark-green shadow-sm ring-1 ring-dark-green/15 transition enabled:hover:bg-cream enabled:active:scale-90 disabled:cursor-not-allowed disabled:opacity-30"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
             <path
