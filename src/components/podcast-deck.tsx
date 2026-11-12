@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import type { Episodio } from "@/lib/podcast-feed";
 import { cn } from "@/lib/utils";
@@ -16,9 +17,22 @@ export function PodcastDeck({ episodios }: { episodios: Episodio[] }) {
 
   if (episodios.length === 0) {
     return (
-      <p className="rounded-card border border-dark-green/10 bg-white px-6 py-10 text-center font-body text-ink/60">
-        Episódios em breve.
-      </p>
+      <div className="relative mx-auto max-w-xl overflow-hidden rounded-card border border-dark-green/10 bg-white p-10 text-center shadow-sm">
+        <Image
+          aria-hidden
+          alt=""
+          src="/brand/compass-rose.webp"
+          width={160}
+          height={160}
+          className="mx-auto opacity-60 mix-blend-multiply"
+        />
+        <h3 className="mt-3 font-display text-xl font-bold text-dark-green">
+          Episódios em breve
+        </h3>
+        <p className="mt-2 font-body text-sm text-ink/55">
+          Aparecem aqui assim que publicados.
+        </p>
+      </div>
     );
   }
 

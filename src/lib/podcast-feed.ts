@@ -2,10 +2,12 @@
  * Episódios do podcast.
  *
  * Fonte: feed RSS oficial do podcast (variável PODCAST_FEED_URL).
- * Todo podcast hospedado no Spotify/Anchor/Megaphone tem um RSS público;
- * novos episódios aparecem no site automaticamente (atualização a cada 30 min).
+ * Todo podcast hospedado no Spotify (via Spotify for Creators/Megaphone)
+ * tem um RSS público; novos episódios aparecem no site automaticamente
+ * (atualização a cada 30 min).
  *
- * Sem o feed configurado (ou indisponível), usa episódios de teste locais.
+ * Sem o feed configurado (ou indisponível), a lista fica vazia e a página
+ * mostra o estado "nada publicado ainda".
  */
 
 export type Episodio = {
@@ -22,42 +24,6 @@ export type Episodio = {
 };
 
 const FEED_URL = process.env.PODCAST_FEED_URL;
-
-/** Episódios de teste enquanto o feed oficial não é publicado. */
-const TESTES: Episodio[] = [
-  {
-    titulo: "Ep. 1 — Comércio exterior maranhense: o panorama",
-    descricao:
-      "Episódio de teste. Panorama das exportações e importações do estado e os setores que mais movimentam a pauta.",
-    data: "05/11/2026",
-    duracao: "38 min",
-    audioUrl: "/podcast-teste/ep1.mp3",
-  },
-  {
-    titulo: "Ep. 2 — Câmbio e gestão de risco para exportadores",
-    descricao:
-      "Episódio de teste. Como proteger margens diante da oscilação do dólar e o que avaliar antes de cotar em moeda estrangeira.",
-    data: "22/10/2026",
-    duracao: "45 min",
-    audioUrl: "/podcast-teste/ep2.mp3",
-  },
-  {
-    titulo: "Ep. 3 — Diplomacia econômica e política comercial",
-    descricao:
-      "Episódio de teste. Acordos comerciais, barreiras tarifárias e o papel do Brasil nas negociações internacionais.",
-    data: "08/10/2026",
-    duracao: "51 min",
-    audioUrl: "/podcast-teste/ep3.mp3",
-  },
-  {
-    titulo: "Ep. 4 — Bioeconomia e sociobiodiversidade amazônica",
-    descricao:
-      "Episódio de teste. Produtos da sociobiodiversidade maranhense e amazônica e seus caminhos para o mercado internacional.",
-    data: "24/09/2026",
-    duracao: "33 min",
-    audioUrl: "/podcast-teste/ep4.mp3",
-  },
-];
 
 function stripHtml(texto: string): string {
   return texto
@@ -144,7 +110,7 @@ function parseFeed(xml: string): Episodio[] {
 }
 
 export async function getEpisodios(): Promise<Episodio[]> {
-  if (!FEED_URL) return TESTES;
+  if (!FEED_URL) return [];
 
   try {
     const res = await fetch(FEED_URL, {
@@ -154,12 +120,11 @@ export async function getEpisodios(): Promise<Episodio[]> {
     });
     if (!res.ok) {
       console.error("[podcast] feed respondeu", res.status);
-      return TESTES;
+      return [];
     }
-    const episodios = parseFeed(await res.text());
-    return episodios.length ? episodios : TESTES;
+    return parseFeed(await res.text());
   } catch (erro) {
     console.error("[podcast] falha ao ler o feed:", String(erro));
-    return TESTES;
+    return [];
   }
 }

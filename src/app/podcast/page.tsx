@@ -73,7 +73,7 @@ export default async function Page() {
             Episódios
           </h2>
           <p className="mt-1 text-center font-body text-sm text-ink/50">
-            Ouça direto por aqui.
+            {episodios.length ? "Ouça direto por aqui." : "Aguardando o primeiro episódio."}
           </p>
           <div className="mt-6">
             <PodcastDeck episodios={episodios} />
