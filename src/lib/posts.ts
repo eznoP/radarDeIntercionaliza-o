@@ -48,6 +48,62 @@ export async function getPublishedPosts(limit = 12): Promise<PostCardData[]> {
 }
 
 /**
+ * Publicações publicadas de uma página de destino específica.
+ * Ordena por destaque e depois pela mais recente. Sem Supabase, [].
+ */
+export async function getPublishedPostsByDestino(
+  destino: string,
+  limit = 60,
+): Promise<PostCardData[]> {
+  if (!isSupabaseConfigured()) return [];
+
+  try {
+    const supabase = createAnonClient();
+    const { data: rows, error } = await supabase
+      .from("posts")
+      .select(
+        "id, slug, title, cover_image_url, is_featured, published_at, category_id, destino, profiles!posts_author_id_fkey(full_name)",
+      )
+      .eq("status", "published")
+      .eq("destino", destino)
+      .order("is_featured", { ascending: false })
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .limit(limit);
+
+    if (error) return [];
+
+    const { data: categories } = await supabase
+      .from("categories")
+      .select("id, name");
+    const nameOf = new Map((categories ?? []).map((c) => [c.id, c.name]));
+
+    type Row = {
+      id: string;
+      slug: string;
+      title: string;
+      cover_image_url: string | null;
+      is_featured: boolean;
+      published_at: string | null;
+      category_id: string;
+      profiles: { full_name: string | null } | null;
+    };
+
+    return (rows as unknown as Row[]).map((row) => ({
+      id: row.id,
+      slug: row.slug,
+      title: row.title,
+      category: nameOf.get(row.category_id) ?? "Geral",
+      image: row.cover_image_url,
+      isFeatured: row.is_featured,
+      publishedAt: row.published_at,
+      author: row.profiles?.full_name ?? "Equipe Radar",
+    }));
+  } catch {
+    return [];
+  }
+}
+
+/**
  * Publicação completa pelo slug, para a página de leitura.
  * Retorna null se não existir (ou não estiver visível para o visitante).
  */

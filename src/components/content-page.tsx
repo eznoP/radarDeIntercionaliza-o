@@ -11,11 +11,14 @@ export function ContentPage({
   title,
   watermark,
   children,
+  extra,
 }: {
   title: string;
   /** Imagem decorativa da marca (caminho em /brand). */
   watermark: string;
   children: React.ReactNode;
+  /** Conteúdo adicional em container largo (ex.: biblioteca de publicações). */
+  extra?: React.ReactNode;
 }) {
   return (
     <>
@@ -47,6 +50,12 @@ export function ContentPage({
             {children}
           </div>
         </div>
+
+        {extra && (
+          <div className="mx-auto -mt-6 w-full max-w-5xl px-5 pb-16 sm:px-8">
+            {extra}
+          </div>
+        )}
       </main>
 
       <SiteFooter />

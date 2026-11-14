@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ContentPage } from "@/components/content-page";
+import { PostsSection } from "@/components/posts-section";
 
 export const metadata: Metadata = {
   title: "Painel de indicadores",
@@ -7,11 +8,14 @@ export const metadata: Metadata = {
     "Dados quantitativos e cotações de moedas atualizados.",
 };
 
-export default function Page() {
+export const revalidate = 300;
+
+export default async function Page() {
   return (
     <ContentPage
       title="Painel de indicadores"
       watermark="/brand/containers.webp"
+      extra={<PostsSection destino="painel-de-indicadores" />}
     >
       <p>
         Nesta seção, o Painel de Indicadores do Radar de Internacionalização

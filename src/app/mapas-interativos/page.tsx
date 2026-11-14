@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ContentPage } from "@/components/content-page";
+import { PostsSection } from "@/components/posts-section";
 
 export const metadata: Metadata = {
   title: "Mapas interativos globais",
@@ -7,11 +8,14 @@ export const metadata: Metadata = {
     "Explore dados de comércio exterior e internacionalização em mapas interativos.",
 };
 
-export default function Page() {
+export const revalidate = 300;
+
+export default async function Page() {
   return (
     <ContentPage
       title="Mapas interativos globais"
       watermark="/brand/mapamundi.webp"
+      extra={<PostsSection destino="mapas-interativos" />}
     >
       <p>
         Nesta seção, o Radar de Internacionalização desenvolverá os Mapas

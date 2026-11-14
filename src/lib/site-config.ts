@@ -14,8 +14,8 @@ export const site: SiteConfig = {
   name: "Radar de Internacionalização",
   shortName: "Radar",
   tagline:
-    "Notícias, tendências e casos de comércio exterior e internacionalização.",
-  newsletterUrl: null,
+    "Notícias, dados e casos de comércio exterior e internacionalização.",
+  newsletterUrl: "https://radardeinternacionalizacao.substack.com/",
 };
 
 /** Nome do ícone da marca associado a um link (ver brand-icons.tsx). */
@@ -77,10 +77,11 @@ export const toolLinks: NavLinkItem[] = [
  * O item "Newsletter" só aparece quando há uma URL configurada.
  */
 const newsletterNav: NavEntry[] = site.newsletterUrl
-  ? [{ label: "Newsletter", href: "/#newsletter" }]
+  ? [{ label: "Newsletter", href: "/newsletter" }]
   : [];
 
 export const navItems: NavEntry[] = [
+  { label: "Home", href: "/" },
   { label: "Sobre nós", items: aboutLinks, align: "left" },
   ...newsletterNav,
   { label: "Podcast", href: "/podcast" },

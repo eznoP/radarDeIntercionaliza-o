@@ -13,6 +13,8 @@ export type PostCardData = {
   image: string | null;
   isFeatured: boolean;
   publishedAt: string | null;
+  /** Autor, quando a listagem o carrega (páginas de destino). */
+  author?: string;
 };
 
 /** Publicação completa, para a página de leitura. */

@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { PostCarousel } from "@/components/post-carousel";
 import { BackToTop } from "@/components/back-to-top";
 import { GlobeGrid } from "@/components/brand-icons";
+import { NewsletterCta } from "@/components/newsletter-cta";
 import { getPublishedPosts } from "@/lib/posts";
 import { site } from "@/lib/site-config";
 
@@ -36,11 +37,10 @@ export default async function HomePage() {
 
           <div className="relative mx-auto w-full max-w-[1400px] px-5 pt-12 pb-10 text-center sm:px-8 sm:pt-16">
             <p className="font-display text-[11px] font-semibold uppercase tracking-[0.35em] text-vanilla/75">
-              {site.name}
+              Projeto de Extensão vinculado à UEMA e PROEXAE
             </p>
-            {/* Título provisório — aguardando o nome oficial do projeto. */}
             <h1 className="mx-auto mt-4 max-w-4xl font-display text-4xl font-bold leading-tight sm:text-5xl md:text-6xl">
-              Nome do Projeto
+              Radar de Internacionalização
             </h1>
             <p className="mx-auto mt-5 max-w-2xl font-body text-sm text-white/75 sm:text-base">
               {site.tagline}
@@ -90,12 +90,9 @@ export default async function HomePage() {
                 Novidades de comércio exterior e internacionalização direto no
                 seu e-mail.
               </p>
-              <a
-                href={site.newsletterUrl}
-                className="mt-7 inline-flex items-center rounded-full bg-dark-green px-7 py-3.5 font-display text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-moss hover:shadow-lg active:translate-y-0 active:scale-95"
-              >
-                Assinar newsletter
-              </a>
+              <div className="mt-12 flex justify-center">
+                <NewsletterCta />
+              </div>
             </div>
           </section>
         )}

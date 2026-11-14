@@ -9,6 +9,7 @@ import { checkbox, optionalText, requiredText } from "@/lib/admin/validation";
 import { createClient } from "@/lib/supabase/server";
 import type { Json, PostStatus } from "@/lib/database.types";
 import { slugify } from "@/lib/slugify";
+import { normalizeDestino } from "@/lib/post-destinos";
 
 const LIST_PATH = "/admin/publicacoes";
 
@@ -55,11 +56,13 @@ function readForm(formData: FormData) {
 
   const slugInput = optionalText(formData, "slug");
   const slug = slugify(slugInput || title);
-  if (!slug) errors.slug = "Insira o/a endereço";
+  if (!slug) errors.title = "Insira o/a título";
 
   const cover_image_url = optionalText(formData, "cover_image_url");
   const video_url = optionalText(formData, "video_url");
   const is_featured = checkbox(formData, "is_featured");
+  const destino = normalizeDestino(formData.get("destino"));
+  if (!destino) errors.destino = "Escolha a página de publicação";
 
   const statusRaw = optionalText(formData, "status");
   const status: PostStatus =
@@ -82,9 +85,38 @@ function readForm(formData: FormData) {
     cover_image_url,
     video_url,
     is_featured,
+    destino,
     status,
     publishedAtRaw,
   };
+}
+
+/**
+ * Garante um slug único: em conflito, acrescenta -2, -3, …
+ * Mantém a URL previsível sem atrapalhar quem publica.
+ */
+async function slugLivre(base: string, ignoreId?: string): Promise<string> {
+  let candidato = base;
+  let n = 1;
+  while (n < 20) {
+    if (!(await slugTaken(candidato, ignoreId))) return candidato;
+    n += 1;
+    candidato = `${base}-${n}`;
+  }
+  return `${base}-${Date.now().toString(36)}`;
+}
+
+/**
+ * Reenvia a gravação sem o campo destino caso a coluna ainda não exista
+ * (SQL de migração pendente), para o painel nunca ficar bloqueado.
+ */
+function eColunaDestinoAusente(mensagem: string): boolean {
+  return (
+    mensagem.includes("destino") &&
+    (mensagem.includes("Could not find") ||
+      mensagem.includes("column") ||
+      mensagem.includes("schema cache"))
+  );
 }
 
 function resolvePublishedAt(raw: string, status: PostStatus): string | null {
@@ -122,16 +154,12 @@ export async function createPost(
   if (Object.keys(f.errors).length) {
     return errorState("Preencha os campos destacados.", f.errors);
   }
-  if (await slugTaken(f.slug)) {
-    return errorState("Já existe uma publicação com este endereço (slug).", {
-      slug: "Escolha outro endereço.",
-    });
-  }
+  const slug = await slugLivre(f.slug);
 
   const supabase = await createClient();
-  const { error } = await supabase.from("posts").insert({
+  const payload = {
     title: f.title,
-    slug: f.slug,
+    slug,
     excerpt: f.excerpt,
     content: f.content,
     cover_image_url: f.cover_image_url || null,
@@ -140,9 +168,15 @@ export async function createPost(
     // Integrante comum só publica em nome próprio; destaque é do gestor.
     author_id: isAdmin ? f.author_id : profile.id,
     is_featured: isAdmin ? f.is_featured : false,
+    destino: f.destino,
     status: f.status,
     published_at: resolvePublishedAt(f.publishedAtRaw, f.status),
-  });
+  };
+  let { error } = await supabase.from("posts").insert(payload);
+  if (error && eColunaDestinoAusente(error.message)) {
+    const { destino: _descartado, ...semDestino } = payload;
+    ({ error } = await supabase.from("posts").insert(semDestino));
+  }
   if (error) return errorState(dbErrorMessage(error));
 
   revalidateAll();
@@ -176,29 +210,31 @@ export async function updatePost(
   if (Object.keys(f.errors).length) {
     return errorState("Preencha os campos destacados.", f.errors);
   }
-  if (await slugTaken(f.slug, id)) {
-    return errorState("Já existe uma publicação com este endereço (slug).", {
-      slug: "Escolha outro endereço.",
-    });
-  }
+  const slug = await slugLivre(f.slug, id);
 
-  const { error } = await supabase
+  const payload = {
+    title: f.title,
+    slug,
+    excerpt: f.excerpt,
+    content: f.content,
+    cover_image_url: f.cover_image_url || null,
+    video_url: f.video_url || null,
+    category_id: f.category_id,
+    // Integrante comum mantém a própria autoria e o destaque do gestor.
+    author_id: isAdmin ? f.author_id : profile.id,
+    is_featured: isAdmin ? f.is_featured : current.is_featured,
+    destino: f.destino,
+    status: f.status,
+    published_at: resolvePublishedAt(f.publishedAtRaw, f.status),
+  };
+  let { error } = await supabase
     .from("posts")
-    .update({
-      title: f.title,
-      slug: f.slug,
-      excerpt: f.excerpt,
-      content: f.content,
-      cover_image_url: f.cover_image_url || null,
-      video_url: f.video_url || null,
-      category_id: f.category_id,
-      // Integrante comum mantém a própria autoria e o destaque do gestor.
-      author_id: isAdmin ? f.author_id : profile.id,
-      is_featured: isAdmin ? f.is_featured : current.is_featured,
-      status: f.status,
-      published_at: resolvePublishedAt(f.publishedAtRaw, f.status),
-    })
+    .update(payload)
     .eq("id", id);
+  if (error && eColunaDestinoAusente(error.message)) {
+    const { destino: _descartado, ...semDestino } = payload;
+    ({ error } = await supabase.from("posts").update(semDestino).eq("id", id));
+  }
   if (error) return errorState(dbErrorMessage(error));
 
   revalidateAll();

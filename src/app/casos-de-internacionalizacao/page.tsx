@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ContentPage } from "@/components/content-page";
+import { PostsSection } from "@/components/posts-section";
 
 export const metadata: Metadata = {
   title: "Casos de internacionalização",
@@ -7,11 +8,14 @@ export const metadata: Metadata = {
     "Artigos com casos reais de internacionalização.",
 };
 
-export default function Page() {
+export const revalidate = 300;
+
+export default async function Page() {
   return (
     <ContentPage
       title="Casos de internacionalização"
       watermark="/brand/containers2.webp"
+      extra={<PostsSection destino="casos-de-internacionalizacao" />}
     >
       <p>
         Nesta seção, apresentamos experiências e trajetórias de empresas e

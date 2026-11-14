@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ContentPage } from "@/components/content-page";
+import { PostsSection } from "@/components/posts-section";
 
 export const metadata: Metadata = {
   title: "Radar de tendências",
@@ -7,11 +8,14 @@ export const metadata: Metadata = {
     "Notícias curtas sobre o que está em alta no comércio exterior e na economia.",
 };
 
-export default function Page() {
+export const revalidate = 300;
+
+export default async function Page() {
   return (
     <ContentPage
       title="Radar de tendências"
       watermark="/brand/globo-vintage-aviao.webp"
+      extra={<PostsSection destino="radar-de-tendencias" />}
     >
       <p>
         Nesta seção, o Radar de Tendências apresenta, por meio de notícias curtas

@@ -7,7 +7,7 @@ const columns = [
     title: "Acompanhe",
     links: [
       ...(site.newsletterUrl
-        ? [{ label: "Newsletter", href: "/#newsletter" }]
+        ? [{ label: "Newsletter", href: "/newsletter" }]
         : []),
       { label: "Podcast", href: "/podcast" },
     ],
@@ -77,6 +77,17 @@ export function SiteFooter() {
           © {new Date().getFullYear()} {site.name}. Todos os direitos
           reservados.
         </p>
+
+        {/* Logos das instituições: centro inferior, tamanho único garantido */}
+        <div className="mt-8 flex justify-center">
+          <Image
+            src="/brand/uema-relacoes.webp"
+            alt="Logos da UEMA (Universidade Estadual do Maranhão) e do curso de Relações Internacionais"
+            width={1098}
+            height={459}
+            className="w-full max-w-[430px] object-contain"
+          />
+        </div>
       </div>
     </footer>
   );

@@ -4,14 +4,14 @@ import { useState } from "react";
 import Link from "next/link";
 import { useFormStatus } from "react-dom";
 import { useActionState } from "react";
-import { AlertTriangle, Loader2, Star } from "lucide-react";
+import { AlertTriangle, ChevronDown, Loader2, Star } from "lucide-react";
 import { Field, fieldInputClass } from "@/components/admin/fields";
 import { FormMessage } from "@/components/admin/form-message";
 import { MediaUploader } from "@/components/admin/media-uploader";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { initialFormState } from "@/lib/admin/types";
 import type { Tables } from "@/lib/database.types";
-import { slugify } from "@/lib/slugify";
+import { DESTINOS } from "@/lib/post-destinos";
 import { createPost, updatePost } from "./actions";
 
 type Post = Tables<"posts">;
@@ -43,9 +43,9 @@ export function PostForm({
   const lockAuthor = !isAdmin;
   const canFeature = isAdmin;
 
-  const [slug, setSlug] = useState(post?.slug ?? "");
-  const [slugEdited, setSlugEdited] = useState(Boolean(post));
   const [featured, setFeatured] = useState(Boolean(post?.is_featured));
+  const [destino, setDestino] = useState<string | null>(post?.destino ?? null);
+  const [destinoAberto, setDestinoAberto] = useState(false);
 
   const missingCategories = categories.length === 0;
   const missingAuthors = !lockAuthor && authors.length === 0;
@@ -111,35 +111,8 @@ export function PostForm({
             name="title"
             defaultValue={post?.title ?? ""}
             placeholder="Título da publicação"
-            onChange={(e) => {
-              if (!slugEdited) setSlug(slugify(e.target.value));
-            }}
             className={fieldInputClass(Boolean(state.fieldErrors?.title))}
           />
-        </Field>
-
-        <Field
-          label="Endereço (slug)"
-          htmlFor="slug"
-          error={state.fieldErrors?.slug}
-          hint="Usado no link da publicação. Gerado a partir do título."
-        >
-          <div className="flex items-center gap-2">
-            <span className="hidden font-mono text-xs text-ink/40 sm:block">
-              /noticia/
-            </span>
-            <input
-              id="slug"
-              name="slug"
-              value={slug}
-              onChange={(e) => {
-                setSlug(e.target.value);
-                setSlugEdited(true);
-              }}
-              placeholder="endereco-da-publicacao"
-              className={fieldInputClass(Boolean(state.fieldErrors?.slug))}
-            />
-          </div>
         </Field>
 
         <Field
@@ -273,6 +246,88 @@ export function PostForm({
               Destaque na Home
             </span>
           </label>
+        )}
+      </section>
+
+      {/* ---------- Publicar em ---------- */}
+      <section className="rounded-card border border-dark-green/10 bg-white p-5 shadow-sm sm:p-6">
+        <h2 className="font-display text-lg font-semibold text-dark-green">
+          Publicar em
+        </h2>
+        <p className="mt-0.5 font-body text-xs text-ink/55">
+          A página do site em que esta publicação aparece.
+        </p>
+
+        <button
+          type="button"
+          onClick={() => setDestinoAberto((v) => !v)}
+          aria-expanded={destinoAberto}
+          className="mt-4 inline-flex w-full items-center justify-between gap-3 rounded-xl border border-dark-green/15 bg-cream/60 px-4 py-3 text-left font-display text-sm font-medium text-dark-green transition hover:bg-cream sm:w-auto sm:min-w-72"
+        >
+          <span className="truncate">
+            {destino
+              ? (DESTINOS.find((d) => d.slug === destino)?.label ??
+                "Escolha a página")
+              : "Escolha a página"}
+          </span>
+          <ChevronDown
+            className={`h-4 w-4 shrink-0 transition-transform duration-300 ${
+              destinoAberto ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+
+        {/* Expansão suave: linha do grid cresce de 0fr para 1fr */}
+        <div
+          className={`grid transition-[grid-template-rows] duration-300 ease-out ${
+            destinoAberto ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+          }`}
+        >
+          <div
+            className={`min-h-0 overflow-hidden transition-opacity duration-300 ${
+              destinoAberto ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              {DESTINOS.map((d) => (
+                <label
+                  key={d.slug}
+                  className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition ${
+                    destino === d.slug
+                      ? "border-dark-green bg-dark-green text-white"
+                      : "border-dark-green/15 bg-cream/60 text-dark-green hover:border-moss hover:bg-cream"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="destino"
+                    value={d.slug}
+                    checked={destino === d.slug}
+                    onChange={() => {
+                      setDestino(d.slug);
+                      setDestinoAberto(false);
+                    }}
+                    className="sr-only"
+                  />
+                  <span
+                    className={`grid h-4 w-4 shrink-0 place-items-center rounded-full border-2 ${
+                      destino === d.slug
+                        ? "border-vanilla bg-vanilla"
+                        : "border-dark-green/30 bg-transparent"
+                    }`}
+                  />
+                  <span className="font-display text-sm font-medium">
+                    {d.label}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+        {state.fieldErrors?.destino && (
+          <p className="mt-2 font-body text-xs text-red-600">
+            {state.fieldErrors.destino}
+          </p>
         )}
       </section>
 

@@ -38,10 +38,15 @@ export default async function Page() {
             height={608}
             className="pointer-events-none absolute -right-20 -top-16 hidden w-[380px] opacity-[0.08] select-none sm:block"
           />
-          <div className="relative mx-auto w-full max-w-5xl px-5 py-14 sm:px-8 sm:py-16">
-            <h1 className="font-display text-4xl font-bold sm:text-5xl">
-              Podcast
-            </h1>
+          <div className="relative mx-auto w-full max-w-5xl px-5 py-12 sm:px-8 sm:py-14">
+            <Image
+              src="/brand/radar-global.webp"
+              alt="Radar Global"
+              width={500}
+              height={500}
+              priority
+              className="mx-auto w-40 sm:w-48"
+            />
           </div>
         </section>
 

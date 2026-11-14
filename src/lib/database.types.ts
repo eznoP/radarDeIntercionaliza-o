@@ -62,6 +62,7 @@ export type Database = {
           category_id: string;
           author_id: string;
           is_featured: boolean;
+          destino: string | null;
           status: PostStatus;
           published_at: string | null;
           created_at: string;
@@ -78,6 +79,7 @@ export type Database = {
           category_id: string;
           author_id: string;
           is_featured?: boolean;
+          destino?: string | null;
           status?: PostStatus;
           published_at?: string | null;
           created_at?: string;
@@ -94,6 +96,7 @@ export type Database = {
           category_id?: string;
           author_id?: string;
           is_featured?: boolean;
+          destino?: string | null;
           status?: PostStatus;
           published_at?: string | null;
           created_at?: string;
