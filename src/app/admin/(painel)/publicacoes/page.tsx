@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { Pencil, Plus, Star } from "lucide-react";
+import { ExternalLink, Pencil, Plus, Star } from "lucide-react";
 import { AdminAlert } from "@/components/admin/admin-alert";
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { createClient, getCurrentProfile } from "@/lib/supabase/server";
 import { adminConfigured } from "@/lib/admin/guard";
+import { labelOfDestino } from "@/lib/post-destinos";
 import type { PostStatus } from "@/lib/database.types";
 import { cn } from "@/lib/utils";
 import { deletePost } from "./actions";
@@ -167,6 +168,11 @@ export default async function PublicacoesPage({
                         Destaque
                       </span>
                     )}
+                    {labelOfDestino(post.destino) && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-cream px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-ink/70 ring-1 ring-dark-green/10">
+                        {labelOfDestino(post.destino)}
+                      </span>
+                    )}
                   </div>
                   <p className="mt-1.5 font-display text-sm font-semibold text-dark-green">
                     {post.title}
@@ -179,6 +185,16 @@ export default async function PublicacoesPage({
                 </div>
 
                 <div className="flex shrink-0 items-center gap-1">
+                  {post.status === "published" && (
+                    <Link
+                      href={`/noticia/${post.slug}`}
+                      target="_blank"
+                      className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 font-display text-xs font-semibold text-glaucous transition hover:bg-glaucous/10"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      Ver postagem
+                    </Link>
+                  )}
                   <Link
                     href={`/admin/publicacoes/${post.id}/editar`}
                     className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 font-display text-xs font-semibold text-glaucous transition hover:bg-glaucous/10"

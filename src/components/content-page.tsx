@@ -52,7 +52,7 @@ export function ContentPage({
         </div>
 
         {extra && (
-          <div className="mx-auto -mt-6 w-full max-w-5xl px-5 pb-16 sm:px-8">
+          <div className="mx-auto -mt-6 w-full max-w-6xl px-5 pb-16 sm:px-8">
             {extra}
           </div>
         )}
