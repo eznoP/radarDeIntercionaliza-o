@@ -21,7 +21,7 @@ export default function Page() {
         episódios do podcast. Uma forma direta de acompanhar o que o Radar
         publica.
       </p>
-      <div className="flex justify-center py-7">
+      <div className="flex justify-center py-8">
         <NewsletterCta />
       </div>
       <p className="text-center font-body text-xs text-ink/45">

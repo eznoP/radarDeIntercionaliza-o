@@ -153,3 +153,36 @@
   padding: 0.9rem 1rem;
   outline: none;
 }
+
+/* ===== Botão Newsletter — órbita contínua dos globos (toque) ===== */
+@keyframes orbitar {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Movimento circular próprio + leve distorção elástica ao girar */
+@keyframes ondular-globo {
+  0%, 100% { transform: rotate(-9deg) scale(1, 1); }
+  35% { transform: rotate(6deg) scale(1.09, 0.92); }
+  70% { transform: rotate(-5deg) scale(0.93, 1.07); }
+}
+
+.globo-orbita {
+  animation: orbitar var(--dur, 9s) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+.globo-contragiro {
+  animation: orbitar var(--dur, 9s) linear infinite reverse;
+  animation-delay: var(--delay, 0s);
+}
+.globo-ondulante {
+  animation: ondular-globo var(--ondu, 3s) ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .globo-orbita,
+  .globo-contragiro,
+  .globo-ondulante {
+    animation: none;
+  }
+}
