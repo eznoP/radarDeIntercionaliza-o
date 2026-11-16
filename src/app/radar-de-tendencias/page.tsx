@@ -14,7 +14,7 @@ export default async function Page() {
   return (
     <ContentPage
       title="Radar de tendências"
-      watermark="/brand/globo-vintage-aviao.webp"
+      heroImage={{ src: "/brand/hero-radar.jpg", w: 783, h: 559 }}
       extra={<PostsSection destino="radar-de-tendencias" />}
     >
       <p>

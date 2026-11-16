@@ -14,7 +14,7 @@ export default async function Page() {
   return (
     <ContentPage
       title="Mapas interativos globais"
-      watermark="/brand/mapamundi.webp"
+      heroImage={{ src: "/brand/hero-mapas.jpg", w: 1440, h: 1029 }}
       extra={<PostsSection destino="mapas-interativos" />}
     >
       <p>

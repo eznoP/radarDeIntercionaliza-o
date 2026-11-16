@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
-import { FileText, Linkedin, LogIn, Mail, UserRound } from "lucide-react";
+import { FileText, Linkedin, UserRound } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { BackToTop } from "@/components/back-to-top";
+import { EmailCopyButton } from "@/components/email-copy-button";
 import { getApprovedIntegrantes } from "@/lib/integrantes";
 import { funcaoLabel } from "@/lib/member-funcao";
 
@@ -113,9 +113,7 @@ export default async function IntegrantesPage() {
                         </SocialLink>
                       )}
                       {p.portfolioEmail && (
-                        <SocialLink href={`mailto:${p.portfolioEmail}`} label="Email">
-                          <Mail className="h-4 w-4" />
-                        </SocialLink>
+                        <EmailCopyButton email={p.portfolioEmail} />
                       )}
                     </div>
                   )}
@@ -123,20 +121,6 @@ export default async function IntegrantesPage() {
               ))}
             </ul>
           )}
-
-          {/* Chamada para quem é do grupo */}
-          <div className="mt-12 flex flex-col items-center gap-3 rounded-card bg-dark-green px-6 py-8 text-center text-white sm:flex-row sm:justify-between sm:text-left">
-            <h2 className="font-display text-lg font-semibold">
-              Você é integrante do Radar?
-            </h2>
-            <Link
-              href="/admin/login"
-              className="inline-flex shrink-0 items-center gap-2 rounded-full bg-vanilla px-6 py-3 font-display text-sm font-semibold text-dark-green shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:scale-95"
-            >
-              <LogIn className="h-4 w-4" />
-              Entrar
-            </Link>
-          </div>
         </div>
       </main>
 

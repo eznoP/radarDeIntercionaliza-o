@@ -13,7 +13,6 @@ export default function Page() {
   return (
     <ContentPage
       title="Newsletter"
-      watermark="/brand/containers.webp"
     >
       <p>
         A Newsletter Radar reúne, em um e-mail periódico, os conteúdos do

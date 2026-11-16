@@ -11,7 +11,6 @@ export default function Page() {
   return (
     <ContentPage
       title="Sobre o projeto"
-      watermark="/brand/compass-rose.webp"
     >
       <p>
         O Radar de Internacionalização nasceu da necessidade da difusão do

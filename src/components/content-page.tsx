@@ -4,18 +4,19 @@ import { SiteFooter } from "@/components/site-footer";
 import { BackToTop } from "@/components/back-to-top";
 
 /**
- * Página de conteúdo textual do site: hero escuro com a marca + corpo
+ * Página de conteúdo textual do site: hero escuro com o título + corpo
  * em fundo cream, com os parágrafos passados como children.
+ * Quando há imagem própria (heroImage), ela abre a descrição.
  */
 export function ContentPage({
   title,
-  watermark,
+  heroImage,
   children,
   extra,
 }: {
   title: string;
-  /** Imagem decorativa da marca (caminho em /brand). */
-  watermark: string;
+  /** Ilustração da página, exibida acima da descrição (caminho em /brand). */
+  heroImage?: { src: string; w: number; h: number };
   children: React.ReactNode;
   /** Conteúdo adicional em container largo (ex.: biblioteca de publicações). */
   extra?: React.ReactNode;
@@ -30,14 +31,6 @@ export function ContentPage({
             aria-hidden
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_80%_at_80%_20%,rgba(122,148,69,0.3),transparent_70%)]"
           />
-          <Image
-            aria-hidden
-            alt=""
-            src={watermark}
-            width={608}
-            height={608}
-            className="pointer-events-none absolute -right-20 -top-16 hidden w-[380px] opacity-[0.08] select-none sm:block"
-          />
           <div className="relative mx-auto w-full max-w-5xl px-5 py-14 sm:px-8 sm:py-16">
             <h1 className="font-display text-4xl font-bold sm:text-5xl">
               {title}
@@ -46,6 +39,16 @@ export function ContentPage({
         </section>
 
         <div className="mx-auto w-full max-w-[720px] px-5 py-12 sm:px-8 sm:py-16">
+          {heroImage && (
+            <Image
+              alt={`Ilustração da página ${title}`}
+              src={heroImage.src}
+              width={heroImage.w}
+              height={heroImage.h}
+              priority
+              className="mb-8 h-auto w-full rounded-card shadow-md ring-1 ring-dark-green/10"
+            />
+          )}
           <div className="space-y-5 font-body text-lg leading-relaxed text-ink/75">
             {children}
           </div>

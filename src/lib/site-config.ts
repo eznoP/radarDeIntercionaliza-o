@@ -47,7 +47,7 @@ export const aboutLinks: NavLinkItem[] = [
   { label: "Integrantes", href: "/integrantes" },
 ];
 
-/** Itens do menu suspenso "Ferramentas". */
+/** Itens do menu suspenso "Páginas". */
 export const toolLinks: NavLinkItem[] = [
   {
     label: "Mapas interativos globais",
@@ -73,7 +73,7 @@ export const toolLinks: NavLinkItem[] = [
 
 /**
  * Estrutura da barra de navegação, na ordem exibida.
- * "Sobre nós" e "Ferramentas" são menus expansíveis.
+ * "Sobre nós" e "Páginas" são menus expansíveis.
  * O item "Newsletter" só aparece quando há uma URL configurada.
  */
 const newsletterNav: NavEntry[] = site.newsletterUrl
@@ -85,5 +85,5 @@ export const navItems: NavEntry[] = [
   { label: "Sobre nós", items: aboutLinks, align: "left" },
   ...newsletterNav,
   { label: "Podcast", href: "/podcast" },
-  { label: "Ferramentas", items: toolLinks, align: "right" },
+  { label: "Páginas", items: toolLinks, align: "right" },
 ];
