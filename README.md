@@ -1,14 +1,13 @@
 # Radar de Internacionalização
 
-Site do projeto **Radar de Internacionalização** — sala do curso de Relações
-Internacionais. Divulga notícias, tendências, casos e indicadores de comércio
-exterior e internacionalização, com um painel administrativo para a equipe.
+[![Acessar o site](https://img.shields.io/badge/Acessar%20o%20site-0A66C2?style=for-the-badge&logo=googlechrome&logoColor=white)](https://radardeinternacionalizacao.vercel.app/)
+Site do projeto **Radar de Internacionalização**
 
 ## Stack
 
 - **Next.js 15** (App Router) + **TypeScript**
 - **Tailwind CSS v4** + componentes próprios
-- **Vercel** (hospedagem) + **Supabase** (banco, autenticação e storage) — fases seguintes
+- **Vercel** (hospedagem) + **Supabase** (banco, autenticação e storage)
 - Conversão de mídia: imagens para `.webp` (sharp) e vídeos para `.webm` (ffmpeg.wasm no navegador)
 
 ## Identidade visual
@@ -27,8 +26,6 @@ Fontes:
 - **Google Sans** — botões, navbar e títulos/home
 - **Xmind** — corpo do texto das notícias
 
-Ambas são self-hospedadas em `src/fonts/` (subsetadas para latin/latin-ext, SIL OFL).
-
 ## Acesso de integrantes
 
 O fluxo de acesso é: **cadastro próprio → aprovação do gestor → login**.
@@ -41,10 +38,6 @@ O fluxo de acesso é: **cadastro próprio → aprovação do gestor → login**.
    também libera o login no Supabase Auth).
 4. Aprovado, o integrante entra em `/admin/login` e publica com escopo
    restrito; pendentes têm apenas a área `/meu-perfil`.
-
-Aprovar também confirma o e-mail interno da conta (a chave
-`SUPABASE_SERVICE_ROLE_KEY` precisa estar configurada), caso contrário o
-Supabase Auth recusa a autenticação mesmo com o perfil aprovado.
 
 ## Estrutura
 
@@ -69,7 +62,9 @@ npm run build    # build de produção
 ## Roadmap
 
 - [x] **Fase 1** — Setup + tela inicial (Home) responsiva
-- [ ] **Fase 2** — Supabase (schema + RLS + autenticação)
-- [ ] **Fase 3** — Painel administrativo (CRUD + categorias/roles separados)
-- [ ] **Fase 4** — Demais páginas: Podcast, Radar de tendências, Casos,
-      Mapas interativos, Painel de indicadores
+- [x] **Fase 2** — Supabase (schema + RLS + autenticação)
+- [x] **Fase 3** — Painel administrativo (CRUD + categorias/roles separados)
+- [x] **Fase 4** — Demais páginas: Podcast, Radar de tendências, Casos,
+    Mapas interativos, Painel de indicadores
+
+# Sistema Completo!
