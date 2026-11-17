@@ -1,6 +1,7 @@
 # Radar de Internacionalização
 
 [![Acessar o site](https://img.shields.io/badge/Acessar%20o%20site-0A66C2?style=for-the-badge&logo=googlechrome&logoColor=white)](https://radardeinternacionalizacao.vercel.app/)
+
 Site do projeto **Radar de Internacionalização**
 
 ## Stack
