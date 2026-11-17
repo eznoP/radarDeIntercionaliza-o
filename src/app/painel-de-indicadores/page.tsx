@@ -14,7 +14,6 @@ export default async function Page() {
   return (
     <ContentPage
       title="Painel de indicadores"
-      heroImage={{ src: "/brand/hero-painel.jpg", w: 1434, h: 1024 }}
       extra={<PostsSection destino="painel-de-indicadores" />}
     >
       <p>

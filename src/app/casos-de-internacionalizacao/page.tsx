@@ -14,7 +14,6 @@ export default async function Page() {
   return (
     <ContentPage
       title="Casos de internacionalização"
-      heroImage={{ src: "/brand/hero-casos.jpg", w: 2409, h: 1721 }}
       extra={<PostsSection destino="casos-de-internacionalizacao" />}
     >
       <p>
