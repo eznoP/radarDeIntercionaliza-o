@@ -45,7 +45,7 @@ export default async function Page() {
               width={500}
               height={500}
               priority
-              className="mx-auto w-40 sm:w-48"
+              className="mx-auto w-64 sm:w-80"
             />
           </div>
         </section>

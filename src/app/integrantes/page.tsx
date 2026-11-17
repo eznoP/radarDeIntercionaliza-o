@@ -5,8 +5,8 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { BackToTop } from "@/components/back-to-top";
 import { EmailCopyButton } from "@/components/email-copy-button";
-import { getApprovedIntegrantes } from "@/lib/integrantes";
-import { funcaoLabel } from "@/lib/member-funcao";
+import { getApprovedIntegrantes, type IntegrantePublico } from "@/lib/integrantes";
+import { funcaoLabel, FUNCAO_ORDEM, type MemberFuncao } from "@/lib/member-funcao";
 
 export const metadata: Metadata = {
   title: "Integrantes",
@@ -18,6 +18,24 @@ export const revalidate = 300;
 
 export default async function IntegrantesPage() {
   const integrantes = await getApprovedIntegrantes();
+
+  // Ordem por função (Orientadora → … → Extensionista), depois alfabética;
+  // quem não tem função definida vai para o fim.
+  const rank = new Map(FUNCAO_ORDEM.map((v, i) => [v, i]));
+  const rankOf = (f: string | null): number => {
+    const i = f ? rank.get(f as MemberFuncao) : undefined;
+    return i ?? FUNCAO_ORDEM.length;
+  };
+  const ordenados = [...integrantes].sort((a, b) => {
+    const ra = rankOf(a.funcao);
+    const rb = rankOf(b.funcao);
+    return ra !== rb ? ra - rb : a.fullName.localeCompare(b.fullName, "pt-BR");
+  });
+
+  // Orientadora(s) no topo, em fileira própria centralizada;
+  // os demais integrantes seguem no grid de 3, ordenados por função.
+  const orientadoras = ordenados.filter((p) => p.funcao === "orientadora");
+  const demais = ordenados.filter((p) => p.funcao !== "orientadora");
 
   return (
     <>
@@ -61,65 +79,21 @@ export default async function IntegrantesPage() {
               </p>
             </div>
           ) : (
-            <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {integrantes.map((p) => (
-                <li
-                  key={p.id}
-                  className="flex flex-col items-center rounded-card border border-dark-green/10 bg-white p-6 text-center shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md"
-                >
-                  <span className="relative grid h-24 w-24 place-items-center overflow-hidden rounded-full bg-sand ring-2 ring-moss/25">
-                    {p.avatarUrl ? (
-                      <Image
-                        src={p.avatarUrl}
-                        alt={p.fullName}
-                        fill
-                        sizes="96px"
-                        className="object-cover"
-                      />
-                    ) : (
-                      <UserRound className="h-10 w-10 text-ink/30" />
-                    )}
-                  </span>
-
-                  <h2 className="mt-4 font-display text-lg font-semibold text-dark-green">
-                    {p.fullName}
-                  </h2>
-                  {p.role && (
-                    <span className="mt-1 rounded-full bg-moss/15 px-3 py-0.5 font-display text-[11px] font-semibold uppercase tracking-wide text-dark-green">
-                      {p.role}
-                    </span>
-                  )}
-                  {funcaoLabel(p.funcao) && (
-                    <span className="mt-1.5 block font-display text-[10px] font-semibold uppercase tracking-wide text-ink/45">
-                      {funcaoLabel(p.funcao)}
-                    </span>
-                  )}
-                  {p.bio && (
-                    <p className="mt-3 font-body text-sm leading-relaxed text-ink/65">
-                      {p.bio}
-                    </p>
-                  )}
-
-                  {(p.linkedinUrl || p.lattesUrl || p.portfolioEmail) && (
-                    <div className="mt-4 flex items-center gap-2 pt-2">
-                      {p.linkedinUrl && (
-                        <SocialLink href={p.linkedinUrl} label="LinkedIn">
-                          <Linkedin className="h-4 w-4" />
-                        </SocialLink>
-                      )}
-                      {p.lattesUrl && (
-                        <SocialLink href={p.lattesUrl} label="Currículo Lattes">
-                          <FileText className="h-4 w-4" />
-                        </SocialLink>
-                      )}
-                      {p.portfolioEmail && (
-                        <EmailCopyButton email={p.portfolioEmail} />
-                      )}
-                    </div>
-                  )}
-                </li>
+            <>
+              {orientadoras.map((p) => (
+                <div key={p.id} className="mx-auto max-w-sm">
+                  <IntegranteCard p={p} />
+                </div>
               ))}
-            </ul>
+
+              <ul className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {demais.map((p) => (
+                  <li key={p.id} className="h-full">
+                    <IntegranteCard p={p} />
+                  </li>
+                ))}
+              </ul>
+            </>
           )}
         </div>
       </main>
@@ -127,6 +101,62 @@ export default async function IntegrantesPage() {
       <SiteFooter />
       <BackToTop />
     </>
+  );
+}
+
+/** Card de integrante (usado no topo para Orientadora e no grid para os demais). */
+function IntegranteCard({ p }: { p: IntegrantePublico }) {
+  return (
+    <div className="flex h-full flex-col items-center rounded-card border border-dark-green/10 bg-white p-6 text-center shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md">
+      <span className="relative grid h-24 w-24 place-items-center overflow-hidden rounded-full bg-sand ring-2 ring-moss/25">
+        {p.avatarUrl ? (
+          <Image
+            src={p.avatarUrl}
+            alt={p.fullName}
+            fill
+            sizes="96px"
+            className="object-cover"
+          />
+        ) : (
+          <UserRound className="h-10 w-10 text-ink/30" />
+        )}
+      </span>
+
+      <h2 className="mt-4 font-display text-lg font-semibold text-dark-green">
+        {p.fullName}
+      </h2>
+      {p.role && (
+        <span className="mt-1 rounded-full bg-moss/15 px-3 py-0.5 font-display text-[11px] font-semibold uppercase tracking-wide text-dark-green">
+          {p.role}
+        </span>
+      )}
+      {funcaoLabel(p.funcao) && (
+        <span className="mt-1.5 block font-display text-[10px] font-semibold uppercase tracking-wide text-ink/45">
+          {funcaoLabel(p.funcao)}
+        </span>
+      )}
+      {p.bio && (
+        <p className="mt-3 font-body text-sm leading-relaxed text-ink/65">
+          {p.bio}
+        </p>
+      )}
+
+      {(p.linkedinUrl || p.lattesUrl || p.portfolioEmail) && (
+        <div className="mt-4 flex items-center gap-2 pt-2">
+          {p.linkedinUrl && (
+            <SocialLink href={p.linkedinUrl} label="LinkedIn">
+              <Linkedin className="h-4 w-4" />
+            </SocialLink>
+          )}
+          {p.lattesUrl && (
+            <SocialLink href={p.lattesUrl} label="Currículo Lattes">
+              <FileText className="h-4 w-4" />
+            </SocialLink>
+          )}
+          {p.portfolioEmail && <EmailCopyButton email={p.portfolioEmail} />}
+        </div>
+      )}
+    </div>
   );
 }
 
