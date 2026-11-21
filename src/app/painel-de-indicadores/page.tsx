@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ContentPage } from "@/components/content-page";
+import { CurrencyQuotes } from "@/components/currency-quotes";
 import { PostsSection } from "@/components/posts-section";
 
 export const metadata: Metadata = {
@@ -14,7 +15,12 @@ export default async function Page() {
   return (
     <ContentPage
       title="Painel de indicadores"
-      extra={<PostsSection destino="painel-de-indicadores" />}
+      extra={
+        <div className="space-y-14">
+          <CurrencyQuotes />
+          <PostsSection destino="painel-de-indicadores" />
+        </div>
+      }
     >
       <p>
         Nesta seção, o Painel de Indicadores do Radar de Internacionalização
