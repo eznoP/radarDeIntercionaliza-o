@@ -1,14 +1,14 @@
 import { TrendingDown, TrendingUp } from "lucide-react";
 import {
   formatarBRL,
-  formatarHora,
+  formatarData,
   formatarVariacao,
   getCotacoes,
 } from "@/lib/currency";
 
 /**
  * Cotações das principais moedas em reais.
- * Renderizada no servidor com cache de 5 minutos; some da página se a API falhar.
+ * Renderizada no servidor; some da página se todas as fontes falharem.
  */
 export async function CurrencyQuotes() {
   const cotacoes = await getCotacoes();
@@ -28,13 +28,15 @@ export async function CurrencyQuotes() {
             Valores de referência em reais, atualizados automaticamente.
           </p>
         </div>
-        <p className="font-body text-xs text-ink/40">Fonte: AwesomeAPI</p>
+        <p className="font-body text-xs text-ink/40">
+          Atualização diária · Fonte: Currency API
+        </p>
       </div>
 
       <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cotacoes.map((c) => {
-          const alta = c.variacao > 0;
-          const baixa = c.variacao < 0;
+          const alta = c.variacao !== null && c.variacao > 0;
+          const baixa = c.variacao !== null && c.variacao < 0;
           return (
             <li
               key={c.code}
@@ -44,19 +46,21 @@ export async function CurrencyQuotes() {
                 <span className="rounded-full bg-moss/15 px-2.5 py-0.5 font-display text-[11px] font-semibold uppercase tracking-wide text-dark-green">
                   {c.code}
                 </span>
-                <span
-                  className={
-                    alta
-                      ? "inline-flex items-center gap-1 font-display text-xs font-semibold text-emerald-600"
-                      : baixa
-                        ? "inline-flex items-center gap-1 font-display text-xs font-semibold text-red-600"
-                        : "inline-flex items-center gap-1 font-display text-xs font-semibold text-ink/50"
-                  }
-                >
-                  {alta && <TrendingUp className="h-3.5 w-3.5" />}
-                  {baixa && <TrendingDown className="h-3.5 w-3.5" />}
-                  {formatarVariacao(c.variacao)}
-                </span>
+                {c.variacao !== null && (
+                  <span
+                    className={
+                      alta
+                        ? "inline-flex items-center gap-1 font-display text-xs font-semibold text-emerald-600"
+                        : baixa
+                          ? "inline-flex items-center gap-1 font-display text-xs font-semibold text-red-600"
+                          : "inline-flex items-center gap-1 font-display text-xs font-semibold text-ink/50"
+                    }
+                  >
+                    {alta && <TrendingUp className="h-3.5 w-3.5" />}
+                    {baixa && <TrendingDown className="h-3.5 w-3.5" />}
+                    {formatarVariacao(c.variacao)}
+                  </span>
+                )}
               </div>
 
               <p className="mt-3 font-body text-sm text-ink/60">{c.nome}</p>
@@ -64,7 +68,7 @@ export async function CurrencyQuotes() {
                 {formatarBRL(c.bid)}
               </p>
               <p className="mt-2 font-body text-[11px] text-ink/40">
-                Atualizado às {formatarHora(c.atualizadoEm)}
+                Referência de {formatarData(c.referencia)}
               </p>
             </li>
           );
