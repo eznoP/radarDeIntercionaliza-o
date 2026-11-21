@@ -65,7 +65,8 @@ export async function getCotacoes(): Promise<Cotacao[]> {
     }
 
     return cotacoes;
-  } catch {
+  } catch (error) {
+    console.error("[cotacoes] falha ao consultar a AwesomeAPI:", error);
     return [];
   }
 }
